@@ -5467,46 +5467,6 @@ ac_compile='${CXX-g++} -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext 1>&5'
 ac_link='${CXX-g++} -o conftest${ac_exeext} $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS 1>&5'
 cross_compiling=$ac_cv_prog_cxx_cross
 
-if test "x${GCC}" = "xyes"
-then
-  OLDCXXFLAGS="$CXXFLAGS";
-  CXXFLAGS="-fno-for-scope"
-  echo $ac_n "checking "for g++ -fno-for-scope option"""... $ac_c" 1>&6
-echo "configure:5476: checking "for g++ -fno-for-scope option"" >&5
-if eval "test \"`echo '$''{'has_gxx_no_for_scope'+set}'`\" = set"; then
-  echo $ac_n "(cached) $ac_c" 1>&6
-else
-  cat > conftest.$ac_ext <<EOF
-#line 5481 "configure"
-#include "confdefs.h"
-
-int main() {
-
-        for (int i = 0; i < 2; i++);
-        i = 0;
-       
-; return 0; }
-EOF
-if { (eval echo configure:5491: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
-  rm -rf conftest*
-  has_gxx_no_for_scope="yes"
-else
-  echo "configure: failed program was:" >&5
-  cat conftest.$ac_ext >&5
-  rm -rf conftest*
-  has_gxx_no_for_scope="no"
-fi
-rm -f conftest*
-      
-fi
-
-echo "$ac_t""$has_gxx_no_for_scope" 1>&6
-  CXXFLAGS="$OLDCXXFLAGS";
-  if test "$has_gxx_no_for_scope" = "yes"
-  then
-    CXXFLAGS="$CXXFLAGS -fno-for-scope"
-  fi
-fi
 ac_ext=c
 # CFLAGS is not in ac_cpp because -g, -O, etc. are not valid cpp options.
 ac_cpp='$CPP $CPPFLAGS'
