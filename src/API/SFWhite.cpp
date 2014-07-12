@@ -79,7 +79,7 @@ bool SFWhite::makeSphere(Sphere *s, const Array<Point3D> &pts){
   float out_center[3];
   ulong bound_arr[3];
   ulong work_size = (1<<15);
-  void *work = (void*)(new unsigned char[work_size]);
+  unsigned char* work = new unsigned char[work_size];
 
   //  call enclosing
   unsigned long in_bound_size = 0;
@@ -87,16 +87,16 @@ bool SFWhite::makeSphere(Sphere *s, const Array<Point3D> &pts){
 	EnclosingBall(3, numPts, centers, NULL,
 		            out_center, radius, NULL, bound_arr,
 		            in_bound_size, &out_bound_size,
-		            work, work_size);
+		            (void*)work, work_size);
 
   s->c.x = out_center[0];
   s->c.y = out_center[1];
   s->c.z = out_center[2];
   s->r = radius;
 
-  delete centers;
-  delete centersInternal;
-  delete work;
+  delete [] centers;
+  delete [] centersInternal;
+  delete [] work;
 
   if (!finite(s->r)){
     //  this can happen when you get bad convergence in the SVD etc.

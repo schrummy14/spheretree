@@ -38,7 +38,7 @@
 
 #include "Point2D.h"
 
-const Point2D Point2D::ZERO = {0,0};
-const Point2D Point2D::MAX = {REAL_MAX, REAL_MAX};
-const Point2D Point2D::MIN = {REAL_MIN, REAL_MIN};
+const Point2D Point2D::ZERO = Point2D(0,0);
+const Point2D Point2D::MAX = Point2D(REAL_MAX, REAL_MAX);
+const Point2D Point2D::MIN = Point2D(REAL_MIN, REAL_MIN);
 

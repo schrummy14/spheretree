@@ -45,9 +45,17 @@
 #include "../Base/Types.h"
 #include <math.h>
 
-//  Data Type 
+//  Data Type
 struct Point2D{
   REAL x, y;
+
+  Point2D ()
+    : x(0.), y(0.)
+  {}
+
+  Point2D (const REAL& p_x, const REAL& p_y)
+    : x(p_x), y(p_y)
+  {}
 
   //  assignment
   __inline void assign(REAL xN, REAL yN){
