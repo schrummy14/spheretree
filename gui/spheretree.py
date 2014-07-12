@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
 import numpy as np
-import argparse
+from optparse import OptionParser
 
 from mayavi import mlab
-from mayavi.core.api import PipelineBase, Source
-from mayavi.core.ui.api import SceneEditor, MlabSceneModel
 
 
 class TreeData():
@@ -17,6 +15,7 @@ class TreeData():
         # Branching factor of the sphere-tree
         self.branching_factor = 0
 
+        print ("Loading %s" % filename)
         inputfile = open(filename)
 
         # Load sizes
@@ -38,6 +37,9 @@ class TreeData():
             y = float(data[1])
             z = float(data[2])
             r = float(data[3])
+            # Yes that happens...
+            if r < 0:
+                r = 0
             self.spheres[level].append(np.array([x, y, z, r]))
             counter += 1
             if counter == self.branching_factor ** level:
@@ -48,21 +50,25 @@ class TreeData():
                 self.spheres.append(list())
 
     def xyzr(self, level):
-      size = self.branching_factor ** level
-      xyzr = np.zeros((size,4))
+      if level >= self.n_levels:
+          level = self.n_levels-1
+      n_spheres = self.branching_factor ** level
+      xyzr = np.zeros((n_spheres,4))
+      print ("Displaying %i spheres" % n_spheres)
       for i, sphere in enumerate(self.spheres[level]):
-          print (i)
           xyzr[i,:] = sphere
 
       return xyzr[:,0], xyzr[:,1], xyzr[:,2], xyzr[:,3]
 
 ################################################################################
 
-parser = argparse.ArgumentParser(description='Load and process a SPH file')
-parser.add_argument('file', help='SPH file')
+parser = OptionParser(description='Load and process a SPH file')
+parser.add_option('-l', '--level', default=0, type=int, metavar='level',
+                  help='Tree level')
 
-args = parser.parse_args()
-sph_file = args.file
+options, args = parser.parse_args()
+sph_file = args[0]
+sph_level = options.level
 
 # Disable the rendering, to get bring up the figure quicker:
 figure = mlab.gcf()
@@ -72,13 +78,13 @@ figure.scene.disable_render = True
 data = TreeData(sph_file)
 
 # Creates a set of points using mlab.points3d
-x, y, z, r = data.xyzr(2)
-display_spheres = mlab.points3d(x, y, z, r, scale_factor=1,
+x, y, z, r = data.xyzr(sph_level)
+display_spheres = mlab.points3d(x, y, z, r, scale_factor=2,
                                 resolution=20)
 
 # Every object has been created, we can reenable the rendering.
 figure.scene.disable_render = False
 
-mlab.title('Sphere-Tree')
+mlab.title('Sphere-Tree Viewer')
 
 mlab.show()
