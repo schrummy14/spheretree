@@ -219,9 +219,9 @@ int simplexMin(int numDim, double init[], double size[], double ftol, int *maxFu
 
   //  tidy up
   for (int i = 0; i <= numDim; i++)
-    delete p[i];
-  delete p;
-  delete y;
+    delete [] p[i];
+  delete [] p;
+  delete [] y;
 
   return canFinish;
 }

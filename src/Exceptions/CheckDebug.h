@@ -47,14 +47,14 @@
 #include "Exception.h"
 #include "ErrorLog.h"
 
-#ifndef _DEBUG
+#ifdef NDEBUG
   //  definitions for relase mode
-  #define CHECK_DEBUG0(cond) 
-  #define CHECK_DEBUG(cond, msg) 
-  #define CHECK_DEBUG1(cond, msg, a) 
-  #define CHECK_DEBUG2(cond, msg, a, b) 
-  #define CHECK_DEBUG3(cond, msg, a, b, c) 
-  #define CHECK_DEBUG4(cond, msg, a, b, c, d) 
+  #define CHECK_DEBUG0(cond)
+  #define CHECK_DEBUG(cond, msg)
+  #define CHECK_DEBUG1(cond, msg, a)
+  #define CHECK_DEBUG2(cond, msg, a, b)
+  #define CHECK_DEBUG3(cond, msg, a, b, c)
+  #define CHECK_DEBUG4(cond, msg, a, b, c, d)
 #else
   #define CHECK_DEBUG0(cond) \
                                   if (!(cond)){  \

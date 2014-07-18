@@ -557,13 +557,14 @@ bool insideSurfaceClosest(const Point3D &pTest, const Surface &s, const SpacialH
 
       //  get the point from the other triangle which is not part of edge
       const Surface::Triangle *tri2 = &s.triangles.index(neigh);
-      for (int i = 0; i < 3; i++){
+      int i = 0;
+      for (i = 0; i < 3; i++){
         if (tri2->v[i] != e[0] && tri2->v[i] != e[1])
           break;
         }
       CHECK_DEBUG0(i != 3);
       Point3D p2 = s.vertices.index(e[1]).p;
-      
+
       //  get signed distance to plane
       float dist = pl1.dist(p2);
 

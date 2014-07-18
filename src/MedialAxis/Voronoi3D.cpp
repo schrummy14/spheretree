@@ -599,7 +599,8 @@ int Voronoi3D::findClosestVertex(const Point3D &p) const{
 void Voronoi3D::replaceNeighbour(Vertex *v, int oldN, int newN){
   CHECK_DEBUG0(newN < vertices.getSize());
 
-  for (int i = 0; i < MAGICK_NUM; i++){
+  int i = 0;
+  for (i = 0; i < MAGICK_NUM; i++){
     if (v->n[i] == oldN){
       v->n[i] = newN;
       break;

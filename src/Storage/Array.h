@@ -97,9 +97,12 @@ template<class T> class Array{
       blocks = (Block*)malloc(initBlocks*sizeof(Block));
       CHECK_MEMORY1(blocks != NULL, "Tryed to Allocate %d bytes", (initBlocks*sizeof(Block)));
 
-      blocks[0].alloc = true;
-      blocks[0].ptr = new T[elementsPerBlock*initBlocks];
-      CHECK_MEMORY1(blocks[0].ptr != NULL, "Tryed to Allocate %d bytes", elementsPerBlock*initBlocks);
+      if (initBlocks > 0)
+      {
+        blocks[0].alloc = true;
+        blocks[0].ptr = new T[elementsPerBlock*initBlocks];
+        CHECK_MEMORY1(blocks[0].ptr != NULL, "Tryed to Allocate %d bytes", elementsPerBlock*initBlocks);
+      }
       for (int i = 1; i < initBlocks; i++){
         blocks[i].alloc = false;
         blocks[i].ptr = &blocks[0].ptr[i*elementsPerBlock];

@@ -39,8 +39,8 @@ void jacobi(double **a, int n, double d[], double **v, int *nrot){
 
     if (sm == 0.0) {
       //The normal return, which relies on quadratic convergence to machine under ow.
-      delete z; //free_vector(z,1,n);
-      delete b; //free_vector(b,1,n);
+      delete [] z; //free_vector(z,1,n);
+      delete [] b; //free_vector(b,1,n);
       return;
       }
 
@@ -99,6 +99,6 @@ void jacobi(double **a, int n, double d[], double **v, int *nrot){
     }
 
 //  OUTPUTINFO("Too many iterations in routine jacobi");
-  delete z;
-  delete b;
+  delete [] z;
+  delete [] b;
 }
