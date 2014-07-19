@@ -70,7 +70,7 @@ bool SFRitter::makeSphere(Sphere *s, const Array<Point3D> &pts){
   xMin.x = yMin.y = zMin.z = REAL_MAX;
   xMax.x = yMax.y = zMax.z = REAL_MIN;
   for (int i = 0; i < numPts; i++){
-    Point3D p = pts.index(i);
+    const Point3D& p = pts.index(i);
 
     if (p.x < xMin.x)
       xMin = p;
@@ -88,7 +88,7 @@ bool SFRitter::makeSphere(Sphere *s, const Array<Point3D> &pts){
       zMax = p; 
     }
 
-  //  x-span is square distance between xmin & xmax
+  //  {x,y,z}-span is the square distance between {x,y,z}min and {x,y,z}max
   float xspan = xMin.distanceSQR(xMax);
   float yspan = yMin.distanceSQR(yMax);
   float zspan = zMin.distanceSQR(zMax);
@@ -117,7 +117,7 @@ bool SFRitter::makeSphere(Sphere *s, const Array<Point3D> &pts){
 
   //  second pass - increment current sphere
   for (int i = 0; i < numPts; i++){
-    Point3D p = pts.index(i);
+    const Point3D& p = pts.index(i);
 
     float oldToPS = pC.distanceSQR(p);
     if (oldToPS > rCS){

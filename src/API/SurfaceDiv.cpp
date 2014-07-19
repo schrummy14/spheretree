@@ -51,7 +51,9 @@ void SurfaceDivision::setup(const Array<Sphere> &spheres, const Array<Surface::P
   const double INF = acos(10);
   if (planes.getM())
     planes.free();
-  planes.allocate(numSph, numSph);
+
+  if (numSph > 0)
+    planes.allocate(numSph, numSph);
 
   //  create planes
   for (int i = 0; i < numSph; i++){

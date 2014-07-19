@@ -68,7 +68,7 @@ bool SFWhite::makeSphere(Sphere *s, const Array<Point3D> &pts){
   for (int i = 0; i < numPts; i++){
     centers[i] = &centersInternal[i*3];
 
-    Point3D p = pts.index(i);
+    const Point3D& p = pts.index(i);
     centers[i][0] = p.x;
     centers[i][1] = p.y;
     centers[i][2] = p.z;
@@ -84,10 +84,10 @@ bool SFWhite::makeSphere(Sphere *s, const Array<Point3D> &pts){
   //  call enclosing
   unsigned long in_bound_size = 0;
   unsigned long out_bound_size = 3;
-	EnclosingBall(3, numPts, centers, NULL,
-		            out_center, radius, NULL, bound_arr,
-		            in_bound_size, &out_bound_size,
-		            (void*)work, work_size);
+  EnclosingBall(3, numPts, centers, NULL,
+                out_center, radius, NULL, bound_arr,
+                in_bound_size, &out_bound_size,
+                (void*)work, work_size);
 
   s->c.x = out_center[0];
   s->c.y = out_center[1];

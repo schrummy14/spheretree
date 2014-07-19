@@ -311,6 +311,10 @@ void STGGeneric::constructTree(SphereTree *st) const{
       //  make the set of surface poitns to be covered by this sphere
       Array<int> *selPtsI = &pointsInSpheres.index(node);
       int numSelPts = selPtsI->getSize();
+
+      if (numSelPts <= 0)
+        break;
+
       Array<Surface::Point> selPts(numSelPts);
       for (int i = 0; i < numSelPts; i++)
         selPts.index(i) = surfacePoints->index(selPtsI->index(i));
@@ -376,7 +380,7 @@ printf("DONE OPTIMISING...\n");
         int childNum = firstChild + i;
 
         //  get sphere
-        Sphere s = children.index(i);
+        const Sphere& s = children.index(i);
 
         //  add sphere to tree
         st->nodes.index(childNum).c = s.c;
@@ -406,13 +410,13 @@ printf("DONE OPTIMISING...\n");
         for (int i = 0; i < numSelPts; i++){
           if (!covered.index(i)){
             //  get point
-            Point3D pt = selPts.index(i).p;
+            const Point3D& pt = selPts.index(i).p;
 
             //  find the sphere
             int minJ = -1;
             float minD = FLT_MAX;
             for (int j = 0; j < numChildren; j++){
-              Sphere s = children.index(j);
+              const Sphere& s = children.index(j);
               float d = pt.distance(s.c);// - s.r;
               if (d < minD){
                 minD = d;

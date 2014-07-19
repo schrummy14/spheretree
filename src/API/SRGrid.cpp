@@ -515,6 +515,8 @@ double SRGrid::sphereNumberFunc(double vals[], void *data, int *canFinish){
   if (destSph.getSize() <= optInfo->limit)
     *canFinish = 1;
 
+  if (count == 0) return 0;
+
   return -metric / (count*count);
 }
 

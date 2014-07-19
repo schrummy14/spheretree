@@ -54,7 +54,7 @@ void evaluateTree(Array<LevelEval> *res, const SphereTree &st, const SEBase *eva
     le->avgError = 0;
 
     for (int j = 0; j < num; j++){
-      const Sphere s = st.nodes.index(start+j);
+      const Sphere& s = st.nodes.index(start+j);
       if (s.r > 0){
         double err = eval->evalSphere(s);
 

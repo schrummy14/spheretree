@@ -45,11 +45,16 @@
 #include "../Geometry/Sphere.h"
 #include "../Storage/kTree.h"
 
-struct STSphere : Sphere{
+struct STSphere : Sphere
+{
   bool hasAux;
   Sphere sAux;
   float errDec;
   float occupancy;
+
+  STSphere ()
+    : Sphere (), hasAux (false), sAux (), errDec (0.), occupancy (0.)
+  {}
 };
 
 class SphereTree : public kTree<STSphere>{

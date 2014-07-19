@@ -41,23 +41,31 @@
 #include "../Base/Defs.h"
 #include <stdio.h>
 #include <string.h>
+#include <fstream>
 
 bool SphereTree::saveSphereTree(const char *fileName, float scale){
-  FILE *f = fopen(fileName, "w");
-  if (!f)
+  OUTPUTINFO("Saving sphere-tree to %s\n", fileName);
+
+  std::ofstream ofs;
+  ofs.open (fileName, std::ofstream::out);
+
+  if (!ofs.is_open ())
     return false;
 
-  fprintf(f, "%d %d\n", levels, degree);
+  ofs << levels << " " <<  degree << std::endl;
   int numnodes = nodes.getSize();
-  for (int i = 0; i < numnodes; i++){
-    STSphere *s = &nodes.index(i);        //  NOW SAVING OCCUPANCY - need to do loading too sometime
-    fprintf(f, "%f %f %f %f %f", s->c.x*scale, s->c.y*scale, s->c.z*scale, s->r*scale, s->occupancy);
-    if (s->hasAux)
-      fprintf(f, " %f %f %f %f %f", s->sAux.c.x*scale, s->sAux.c.y*scale, s->sAux.c.z*scale, s->sAux.r*scale, s->errDec);
-    fprintf(f, "\n");
-    };
+  for (int i = 0; i < numnodes; i++)
+  {
+    const STSphere& s = nodes.index(i);        //  NOW SAVING OCCUPANCY - need to do loading too sometime
+    ofs << s.c.x*scale << " " <<  s.c.y*scale << " " << s.c.z*scale << " "
+        << s.r*scale << " " << s.occupancy;
+    if (s.hasAux)
+      ofs << " " << s.sAux.c.x*scale << " " << s.sAux.c.y*scale << " "
+          << s.sAux.c.z*scale << " " << s.sAux.r*scale << " " << s.errDec;
+    ofs << std::endl;
+  }
 
-  fclose(f);
+  ofs.close ();
   return true;
 }
 
@@ -185,7 +193,7 @@ bool SphereTree::saveSpheres(const Array<Sphere> &nodes, const char *fileName, f
       if (r > boundSphere.r)
         boundSphere.r = s.r;
       }
-    }  
+    }
   //  open file
   FILE *f = fopen(fileName, "w");
   if (!f)

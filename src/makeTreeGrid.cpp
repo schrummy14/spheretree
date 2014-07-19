@@ -162,7 +162,7 @@ bool constructTree(const char *file){
   /*
       scale box
   */
-  float boxScale = sur.fitIntoBox(1000);
+  float boxScale = sur.fitIntoBox(1);
 
   /*
       make medial tester
