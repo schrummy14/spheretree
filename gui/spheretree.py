@@ -7,7 +7,7 @@ import os, sys, shutil
 import numpy as np
 
 from mayavi import mlab
-
+import yaml
 
 class TreeData():
     def __init__(self, filename):
@@ -19,6 +19,14 @@ class TreeData():
         self.branching_factor = 0
 
         print ("Loading %s" % filename)
+
+        extension = filename.split(".")[-1].lower()
+        if extension == "sph":
+            self.load_sph(filename)
+        elif extension == "yml":
+            self.load_yaml(filename)
+
+    def load_sph(self, filename):
         inputfile = open(filename)
 
         # Load sizes
@@ -40,10 +48,9 @@ class TreeData():
             y = float(data[1])
             z = float(data[2])
             r = float(data[3])
-            # Yes that happens...
-            if r < 0:
-                r = 0
-            self.spheres[level].append(np.array([x, y, z, r]))
+            # Some spheres can be removed during the construction and get r < 0
+            if r > 0:
+                self.spheres[level].append(np.array([x, y, z, r]))
             counter += 1
             if counter == self.branching_factor ** level:
                 if level == self.n_levels:
@@ -52,10 +59,29 @@ class TreeData():
                 counter = 0
                 self.spheres.append(list())
 
+    def load_yaml(self, filename):
+        with open(filename, 'r') as f:
+            doc = yaml.load(f)
+            self.n_levels = doc["levels"]
+            self.branching_factor = doc["degree"]
+            self.spheres = dict()
+
+            for data in doc["data"]:
+                level = data["level"]
+                self.spheres[level] = list()
+                for sphere in data["spheres"]:
+                    if sphere["radius"] > 0:
+                        self.spheres[level].append \
+                            (np.array([sphere["center"][0],
+                                       sphere["center"][1],
+                                       sphere["center"][2],
+                                       sphere["radius"]]))
+
+
     def xyzr(self, level):
       if level >= self.n_levels:
           level = self.n_levels-1
-      n_spheres = self.branching_factor ** level
+      n_spheres = len(self.spheres[level])
       xyzr = np.zeros((n_spheres,4))
       print ("Displaying %i spheres" % n_spheres)
       for i, sphere in enumerate(self.spheres[level]):
@@ -69,10 +95,21 @@ def algo_list():
     """
     return {"grid", "hubbard", "medial", "octree", "spawn"}
 
-def create_sch(dae_file=None, obj_file=None, algo="grid", depth=3, branch=8,
+def algo_options():
+    """
+    Return the list of default options for supported algorithms.
+    """
+    return {"grid": "",
+            "hubbard": "",
+            "medial": "-merge -burst -expand",
+            "octree": "",
+            "spawn": ""}
+
+def create_yaml(dae_file=None, obj_file=None, algo="grid", depth=3, branch=8,
                force=False):
     """
-    Create a SCH file from a DAE (Collada) or OBJ (Wavefront) file.
+    Create a YAML file containing a sphere-tree from a DAE (Collada) or
+    OBJ (Wavefront) file.
     Requires meshlab for DAE to OBJ conversion.
     """
     assert (algo in algo_list)
@@ -107,19 +144,21 @@ def create_sch(dae_file=None, obj_file=None, algo="grid", depth=3, branch=8,
         sys.exit(2)
 
     # Second: process OBJ with spheretree
-    result_file = "/tmp/%s-%s.sph" % (name, algo)
+    result_file = "/tmp/%s-%s.yml" % (name, algo)
     exec_name = "makeTree%s" % algo.capitalize()
     if not os.path.exists(result_file) or force:
-        command = "%s -nopause -branch %i -depth %i %s" \
-                  % (exec_name, branch, depth, tmp_file)
-        p = Popen(command, shell = True, stdin = sys.stdin, stdout = PIPE, stderr = PIPE, bufsize = 1)
+        command = "%s -nopause -yaml -branch %i -depth %i %s %s" \
+                  % (exec_name, branch, depth, algo_options()[algo], tmp_file)
+        print("Running: %s" % command)
+        p = Popen(command, shell = True, stdin = sys.stdin,
+                  stdout = PIPE, stderr = PIPE, bufsize = 1)
 
         while p.poll() is None:
             out = p.stdout.read(1)
             sys.stdout.write(out)
             sys.stdout.flush()
 
-    # Return resulting SCH file
+    # Return resulting YAML file
     return result_file
 
 
@@ -141,7 +180,7 @@ def display_collada(dae_file):
             elif prim_type == 'BoundPolylist':
                 triangles = prim.triangleset()
             else:
-                print ("Unsupported mesh type used: %s" % prim_type)
+                # Unsupported mesh type
                 triangles = None
 
             if triangles is not None:
@@ -223,15 +262,15 @@ elif input_file.lower().endswith(".obj"):
 sphere_opacity = 0.5
 
 if from_dae:
-    # Compute SCH result from DAE file
-    sph_file = create_sch(dae_file=input_file, algo=algo,
-                          depth=sph_depth, branch=sph_branch,
-                          force=force)
+    # Compute YAML result from DAE file
+    sph_file = create_yaml(dae_file=input_file, algo=algo,
+                           depth=sph_depth, branch=sph_branch,
+                           force=force)
 elif from_obj:
-    # Compute SCH result from OBJ file
-    sph_file = create_sch(obj_file=input_file, algo=algo,
-                          depth=sph_depth, branch=sph_branch,
-                          force=force)
+    # Compute YAML result from OBJ file
+    sph_file = create_yaml(obj_file=input_file, algo=algo,
+                           depth=sph_depth, branch=sph_branch,
+                           force=force)
 else:
     sph_file = input_file
     sphere_opacity = 1.0
