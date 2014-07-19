@@ -42,6 +42,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include "Surface/Surface.h"
 #include "Surface/OBJLoader.h"
 #include "MedialAxis/Voronoi3D.h"
@@ -61,6 +64,7 @@ int numSamples = 500;       //  number of samples to put on surface for static m
 int minSamples = 1;         //  minimum number of points per triangle for static medial
 bool verify = false;        //  verify model before construction
 bool nopause = false;       //  will we pause before starting
+bool yaml = false;          //  do we export to YAML
 
 /*
     info for decoding parameters
@@ -73,6 +77,7 @@ const IntParam intParams[] = {{"branch", &branch},
 
 const BoolParam boolParams[] = {{"verify", &verify, TRUE},
                                 {"nopause", &nopause, TRUE},
+                                {"yaml", &yaml, TRUE},
                                 {NULL, NULL}};
 
 /*
@@ -80,7 +85,8 @@ const BoolParam boolParams[] = {{"verify", &verify, TRUE},
 */
 void waitForKey();
 int error(const char *errorMsg, const char *errorMsg1 = NULL);
-bool constructTree(const char *file);
+bool constructTree(const boost::filesystem::path& file,
+                   bool toYAML);
 
 /*
     MAINLINE
@@ -103,7 +109,7 @@ int main(int argc, const char *argv[]){
   int numFiles = 0;
   for (int i = 1; i < argc; i++){
     if (argv[i] != NULL){
-      constructTree(argv[i]);
+      constructTree(argv[i], yaml);
       numFiles++;
       }
     }
@@ -120,20 +126,19 @@ int main(int argc, const char *argv[]){
 /*
     construct sphere-tree for the model
 */
-bool constructTree(const char *file){
-  printf("FileName : %s\n\n", file);
+bool constructTree(const boost::filesystem::path& input_file,
+                   bool toYAML)
+{
+  boost::filesystem::path output_file
+    = input_file.parent_path () / boost::filesystem::basename (input_file);
 
-  /*
-      generate the filename
-  */
-  char inputFile[1024];
-  strcpy(inputFile, file);
-  int len = strlen(inputFile);
-  int i;
-  for (i = len-1; i >= 0; i--){
-    if (inputFile[i] == '.')
-      break;
-    }
+  if (toYAML)
+    output_file += "-hubbard.yml";
+  else
+    output_file += "-hubbard.sph";
+
+  printf("Input file: %s\n", input_file.c_str ());
+  printf("Output file: %s\n\n", output_file.c_str ());
 
   /*
       load the surface model
@@ -141,17 +146,16 @@ bool constructTree(const char *file){
   Surface sur;
 
   bool loaded = false;
-  if (strcompare("obj", &inputFile[len-3]) == 0)
-    loaded = loadOBJ(&sur, inputFile);
+  std::string extension = boost::algorithm::to_lower_copy (input_file.extension ().string ());
+  if (extension == ".obj")
+    loaded = loadOBJ(&sur, input_file.c_str ());
   else
-    loaded = sur.loadSurface(inputFile);
+    loaded = sur.loadSurface(input_file.c_str ());
 
   if (!loaded){
-    printf("ERROR : Unable to load input file (%s)\n\n", inputFile);
+    printf("ERROR : Unable to load input file (%s)\n\n", input_file.c_str ());
     return false;
     }
-  if (i >= 0)
-    inputFile[i] = '\0';
 
   /*
       scale box
@@ -216,29 +220,30 @@ bool constructTree(const char *file){
   /*
      save sphere-tree
   */
-  char sphereFile[1024];
-  sprintf(sphereFile, "%s-hubbard.sph", inputFile);
-  if (tree.saveSphereTree(sphereFile, 1.0f/boxScale)){
-    FILE *f = fopen(sphereFile, "a");
-    if (f){
-      //  write parameters
-      fprintf(f, "\n\n");
-      fprintf(f, "Options : \n");
-      writeParam(f, intParams);
-      writeParam(f, boolParams);
+  if (tree.saveSphereTree(output_file, 1.0f/boxScale)){
+    if (!yaml)
+    {
+      FILE *f = fopen(output_file.c_str (), "a");
+      if (f){
+        //  write parameters
+        fprintf(f, "\n\n");
+        fprintf(f, "Options : \n");
+        writeParam(f, intParams);
+        writeParam(f, boolParams);
 
-      //  count medial spheres and output info
-      int numMed = 0;
-      int numVert = vor.vertices.getSize();
-      for (int a = 0; a < numVert; a++){
-        Voronoi3D::Vertex *vert = &vor.vertices.index(a);
-        if (mt.isMedial(vert))
-          numMed++;
+        //  count medial spheres and output info
+        int numMed = 0;
+        int numVert = vor.vertices.getSize();
+        for (int a = 0; a < numVert; a++){
+          Voronoi3D::Vertex *vert = &vor.vertices.index(a);
+          if (mt.isMedial(vert))
+            numMed++;
         }
-      fprintf(f, "\n\n\n%d samples, %d medial spheres\n", samplePts.getSize(), numMed);
+        fprintf(f, "\n\n\n%d samples, %d medial spheres\n", samplePts.getSize(), numMed);
 
-      fclose(f);
+        fclose(f);
       }
+    }
 
     return true;
     }

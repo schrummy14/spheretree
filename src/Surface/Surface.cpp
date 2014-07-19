@@ -105,7 +105,7 @@ bool Surface::loadMesh(const CRhinoMesh &mesh){
 }
 #endif
 
-bool Surface::loadRhinoSurface(const char *fileName, char **err, float boxSize){
+bool Surface::loadRhinoSurface(const char *fileName, char **err, REAL boxSize){
 #ifdef USE_RHINO_IO
   //  read rhino file
   FILE *f = fopen(fileName, "rb");
@@ -191,21 +191,21 @@ bool Surface::loadRhinoSurface(const char *fileName, char **err, float boxSize){
 #endif
 }
 
-float Surface::fitIntoBox(float boxSize){
+REAL Surface::fitIntoBox(REAL boxSize){
   //  calculate scale to fit into a 2*2*2 box
-  float sX = 2.0/(pMax.x - pMin.x);
-  float sY = 2.0/(pMax.y - pMin.y);
-  float sZ = 2.0/(pMax.z - pMin.z);
-  float scale = sX;
+  REAL sX = 2.0/(pMax.x - pMin.x);
+  REAL sY = 2.0/(pMax.y - pMin.y);
+  REAL sZ = 2.0/(pMax.z - pMin.z);
+  REAL scale = sX;
   if (sY < scale)
 	  scale = sY;
   if (sZ < scale)
 	  scale = sZ;
   scale *= boxSize;
 
-  float cX = (pMax.x + pMin.x) / 2.0f;
-  float cY = (pMax.y + pMin.y) / 2.0f;
-  float cZ = (pMax.z + pMin.z) / 2.0f;
+  REAL cX = (pMax.x + pMin.x) / 2.0f;
+  REAL cY = (pMax.y + pMin.y) / 2.0f;
+  REAL cZ = (pMax.z + pMin.z) / 2.0f;
 
   int numVert = vertices.getSize();
   for (int i = 0; i < numVert; i++){
@@ -264,7 +264,7 @@ void Surface::setupAdjacent(int mn, int mx){
 }
 
 //  our own format with edge adjacency
-bool Surface::loadSurface(const char *fileName, float boxSize){
+bool Surface::loadSurface(const char *fileName, REAL boxSize){
   FILE *f = fopen(fileName, "r");
   if (!f)
     return FALSE;
@@ -280,7 +280,7 @@ bool Surface::loadSurface(const char *fileName, float boxSize){
   for (int i = 0; i < numPts; i++){
     Point *p = &vertices.index(i);
 
-    float x, y, z;
+    REAL x, y, z;
     fscanf(f, "%f%f%f", &x, &y, &z);
     p->p.x = x;
     p->p.y = y;
@@ -331,7 +331,7 @@ bool Surface::loadSurface(const char *fileName, float boxSize){
   return TRUE;
 }
 
-bool Surface::loadMinimalSurface(const char *fileName, float boxSize){
+bool Surface::loadMinimalSurface(const char *fileName, REAL boxSize){
   FILE *f = fopen(fileName, "r");
   if (!f)
     return FALSE;
@@ -348,7 +348,7 @@ bool Surface::loadMinimalSurface(const char *fileName, float boxSize){
     Point *p = &vertices.index(i);
 
     //  load position
-    float x, y, z;
+    REAL x, y, z;
     fscanf(f, "%f%f%f", &x, &y, &z);
     p->p.x = x;
     p->p.y = y;
@@ -390,7 +390,7 @@ bool Surface::loadMinimalSurface(const char *fileName, float boxSize){
   return TRUE;
 }
 
-bool Surface::saveSurface(const char *fileName, float scale){
+bool Surface::saveSurface(const char *fileName, REAL scale){
   FILE *f = fopen(fileName, "w");
   if (!f)
     return FALSE;
@@ -501,14 +501,14 @@ void Surface::getNormal(Vector3D *n, const Point3D &p, int tri) const{
   l0.intersect(&pI, l2);
 
   //  interpolate pI's value between P0 & P1
-  float d01 = pI.distance(P0) / P1.distance(P0);
+  REAL d01 = pI.distance(P0) / P1.distance(P0);
   Vector3D vI;
   vI.x = (1-d01)*p0->n.x + d01*p1->n.x;
   vI.y = (1-d01)*p0->n.y + d01*p1->n.y;
   vI.z = (1-d01)*p0->n.z + d01*p1->n.z;
 
   //  interpolate Pt's value from P2 and pI
-  float d = Pt.distance(P2) / pI.distance(P2);
+  REAL d = Pt.distance(P2) / pI.distance(P2);
   n->x = (1-d)*p2->n.x + d*vI.x;
   n->y = (1-d)*p2->n.y + d*vI.y;
   n->z = (1-d)*p2->n.z + d*vI.z;
@@ -620,7 +620,7 @@ void Surface::stitchTriangles(){
             Point3D q1 = vertices.index(t1->v[(e+1)%3]).p;
 
             //  forward edge
-            float d = p0.distance(q0) + p1.distance(q1);
+            REAL d = p0.distance(q0) + p1.distance(q1);
             if (d < minD){
               minD = d;
               minT = tri;
@@ -733,12 +733,12 @@ void Surface::getBoundingSphere(Sphere *s) const{
     }
 
   //  {x,y,z}-span is the square distance between {x,y,z}min and {x,y,z}max
-  float xspan = xMin.distanceSQR(xMax);
-  float yspan = yMin.distanceSQR(yMax);
-  float zspan = zMin.distanceSQR(zMax);
+  REAL xspan = xMin.distanceSQR(xMax);
+  REAL yspan = yMin.distanceSQR(yMax);
+  REAL zspan = zMin.distanceSQR(zMax);
 
   //  dMin and dMax are the maximally separated pair
-  float maxSpan = xspan;
+  REAL maxSpan = xspan;
   Point3D dMin = xMin, dMax = xMax;
   if (yspan > maxSpan){
     maxSpan = yspan;
@@ -756,20 +756,20 @@ void Surface::getBoundingSphere(Sphere *s) const{
   pC.x = (dMin.x + dMax.x)/2.0f;
   pC.y = (dMin.y + dMax.y)/2.0f;
   pC.z = (dMin.z + dMax.z)/2.0f;
-  float rCS = pC.distanceSQR(dMax);
-  float rC = sqrt(rCS);
+  REAL rCS = pC.distanceSQR(dMax);
+  REAL rC = sqrt(rCS);
 
   //  second pass - increment current sphere
   for (int i = 0; i < numPts; i++){
     const Point3D& p = vertices.index(i).p;
 
-    float oldToPS = pC.distanceSQR(p);
+    REAL oldToPS = pC.distanceSQR(p);
     if (oldToPS > rCS){
       //  this point is outside the sphere
-      float oldToP = sqrt(oldToPS);
+      REAL oldToP = sqrt(oldToPS);
       rC = (rC + oldToP)/2.0;
       rCS = rC*rC;
-      float oldToNew = oldToP - rC;
+      REAL oldToNew = oldToP - rC;
 
       //  new sphere center
       pC.x = (rC*pC.x + oldToNew*p.x)/oldToP;

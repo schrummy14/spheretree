@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -41,36 +41,85 @@
 #include "../Base/Defs.h"
 #include <stdio.h>
 #include <string.h>
-#include <fstream>
 
-bool SphereTree::saveSphereTree(const char *fileName, float scale){
-  OUTPUTINFO("Saving sphere-tree to %s\n", fileName);
+#include <fstream>
+#include <cmath>
+#include <boost/filesystem.hpp>
+
+bool SphereTree::saveSphereTree(const boost::filesystem::path& filename, REAL scale){
+  OUTPUTINFO("Saving sphere-tree to %s\n", filename.c_str ());
 
   std::ofstream ofs;
-  ofs.open (fileName, std::ofstream::out);
+  ofs.open (filename.string ().c_str (), std::ofstream::out);
 
   if (!ofs.is_open ())
     return false;
 
-  ofs << levels << " " <<  degree << std::endl;
   int numnodes = nodes.getSize();
-  for (int i = 0; i < numnodes; i++)
+
+  // If saving as a YAML file
+  if (filename.extension () == ".yml")
   {
-    const STSphere& s = nodes.index(i);        //  NOW SAVING OCCUPANCY - need to do loading too sometime
-    ofs << s.c.x*scale << " " <<  s.c.y*scale << " " << s.c.z*scale << " "
-        << s.r*scale << " " << s.occupancy;
-    if (s.hasAux)
-      ofs << " " << s.sAux.c.x*scale << " " << s.sAux.c.y*scale << " "
-          << s.sAux.c.z*scale << " " << s.sAux.r*scale << " " << s.errDec;
-    ofs << std::endl;
+    std::string tab = "    ";
+    ofs << "levels: " << levels << std::endl;
+    ofs << "degree: " << degree << std::endl;
+
+    ofs << "data:" << std::endl;
+
+    int i = 0;
+
+    // For each level of the tree
+    for (int l = 0; l < levels; l++)
+    {
+      ofs << tab << "- level: " << l << std::endl;
+      ofs << tab << "  spheres: [" << std::endl;
+
+      // For each sphere of this level
+      int n_spheres = std::pow (degree, l);
+      for (int j = 0; j < n_spheres; j++)
+      {
+        const STSphere& s = nodes.index (i++);        //  NOW SAVING OCCUPANCY - need to do loading too sometime
+
+        ofs << tab << tab << "{center: ["
+            << s.c.x * scale << ", " <<  s.c.y * scale << ", " << s.c.z * scale
+            << "], radius: " << s.r * scale;
+
+      if (s.hasAux)
+        ofs << ", aux: {center: [" << s.sAux.c.x * scale
+            << "," << s.sAux.c.y*scale << ", " << s.sAux.c.z * scale << "], "
+            << "radius: " << s.sAux.r * scale
+            << ", errDec: " << s.errDec << "}";
+
+        ofs << "}";
+
+        if (j != n_spheres - 1)
+          ofs << ",";
+        ofs << std::endl;
+      }
+      ofs << tab << "  ]" << std::endl;
+    }
+  }
+  else // Using SPH format
+  {
+    ofs << levels << " " <<  degree << std::endl;
+    for (int i = 0; i < numnodes; i++)
+    {
+      const STSphere& s = nodes.index(i);        //  NOW SAVING OCCUPANCY - need to do loading too sometime
+      ofs << s.c.x*scale << " " <<  s.c.y*scale << " " << s.c.z*scale << " "
+          << s.r*scale << " " << s.occupancy;
+      if (s.hasAux)
+        ofs << " " << s.sAux.c.x*scale << " " << s.sAux.c.y*scale << " "
+            << s.sAux.c.z*scale << " " << s.sAux.r*scale << " " << s.errDec;
+      ofs << std::endl;
+    }
   }
 
   ofs.close ();
   return true;
 }
 
-bool SphereTree::loadSphereTree(const char *fileName, float scale){
-  FILE *f = fopen(fileName, "r");
+bool SphereTree::loadSphereTree(const boost::filesystem::path& fileName, REAL scale){
+  FILE *f = fopen(fileName.string ().c_str (), "r");
   if (!f)
     return false;
 
@@ -94,7 +143,7 @@ bool SphereTree::loadSphereTree(const char *fileName, float scale){
       while (fgets(buffer, 1023, f) && strlen(buffer) <= 1);
 
       //  read the sphere
-      float x, y, z, r, x1, y1, z1, r1, errDec;
+      REAL x, y, z, r, x1, y1, z1, r1, errDec;
       if (sscanf(buffer, "%f %f %f %f %f %f %f %f %f", &x, &y, &z, &r, &x1, &y1, &z1, &r1, &errDec) == 9){
         STSphere *s = &nodes.index(baseI + i);
         s->c.x = x*scale;
@@ -164,7 +213,8 @@ void SphereTree::initNode(int node, int level){
     }
 }
 
-bool SphereTree::saveSpheres(const Array<Sphere> &nodes, const char *fileName, float scale){
+bool SphereTree::saveSpheres(const Array<Sphere> &nodes,
+                             const boost::filesystem::path& fileName, REAL scale){
   int numSph = nodes.getSize();
 
   //  compute simple bounding sphere
@@ -189,13 +239,13 @@ bool SphereTree::saveSpheres(const Array<Sphere> &nodes, const char *fileName, f
   for (int i = 0; i < numSph; i++){
     Sphere s = nodes.index(i);
     if (s.r > 0){
-      float r = boundSphere.c.distance(s.c) + s.r;
+      REAL r = boundSphere.c.distance(s.c) + s.r;
       if (r > boundSphere.r)
         boundSphere.r = s.r;
       }
     }
   //  open file
-  FILE *f = fopen(fileName, "w");
+  FILE *f = fopen(fileName.c_str (), "w");
   if (!f)
     return false;
 

@@ -42,6 +42,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <string>
+
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include "Surface/Surface.h"
 #include "Surface/OBJLoader.h"
 #include "API/MSGrid.h"
@@ -65,6 +70,7 @@ int minCoverPts = 5;        //  minimum number of points per triangle for covera
 bool verify = false;        //  verify model before construction
 bool nopause = false;       //  will we pause before starting
 bool eval = false;          //  do we evaluate the sphere-tree after construction
+bool yaml = false;          //  do we export to YAML
 
 /*
     info for decoding parameters
@@ -79,6 +85,7 @@ const IntParam intParams[] = {{"testerLevels", &testerLevels},
 const BoolParam boolParams[] = {{"verify", &verify, TRUE},
                                 {"nopause", &nopause, TRUE},
                                 {"eval", &eval, TRUE},
+                                {"yaml", &yaml, TRUE},
                                 {NULL, NULL}};
 
 /*
@@ -86,7 +93,8 @@ const BoolParam boolParams[] = {{"verify", &verify, TRUE},
 */
 void waitForKey();
 int error(const char *errorMsg, const char *errorMsg1 = NULL);
-bool constructTree(const char *file);
+bool constructTree(const boost::filesystem::path& input_file,
+                   bool toYAML = false);
 
 /*
     MAINLINE
@@ -109,7 +117,7 @@ int main(int argc, const char *argv[]){
   int numFiles = 0;
   for (int i = 1; i < argc; i++){
     if (argv[i] != NULL){
-      constructTree(argv[i]);
+      constructTree(argv[i], yaml);
       numFiles++;
       }
     }
@@ -126,20 +134,19 @@ int main(int argc, const char *argv[]){
 /*
     construct sphere-tree for the model
 */
-bool constructTree(const char *file){
-  printf("FileName : %s\n\n", file);
+bool constructTree(const boost::filesystem::path& input_file,
+                   bool toYAML)
+{
+  boost::filesystem::path output_file
+    = input_file.parent_path () / boost::filesystem::basename (input_file);
 
-  /*
-      generate the filename
-  */
-  char inputFile[1024];
-  strcpy(inputFile, file);
-  int len = strlen(inputFile);
-  int i;
-  for (i = len-1; i >= 0; i--){
-    if (inputFile[i] == '.')
-      break;
-    }
+  if (toYAML)
+    output_file += "-grid.yml";
+  else
+    output_file += "-grid.sph";
+
+  printf("Input file: %s\n", input_file.c_str ());
+  printf("Output file: %s\n\n", output_file.c_str ());
 
   /*
       load the surface model
@@ -147,17 +154,16 @@ bool constructTree(const char *file){
   Surface sur;
 
   bool loaded = false;
-  if (strcompare("obj", &inputFile[len-3]) == 0)
-    loaded = loadOBJ(&sur, inputFile);
+  std::string extension = boost::algorithm::to_lower_copy (input_file.extension ().string ());
+  if (extension == ".obj")
+    loaded = loadOBJ(&sur, input_file.c_str ());
   else
-    loaded = sur.loadSurface(inputFile);
+    loaded = sur.loadSurface(input_file.c_str ());
 
   if (!loaded){
-    printf("ERROR : Unable to load input file (%s)\n\n", inputFile);
+    printf("ERROR : Unable to load input file (%s)\n\n", input_file.c_str ());
     return false;
     }
-  if (i >= 0)
-    inputFile[i] = '\0';
 
   /*
       scale box
@@ -236,25 +242,26 @@ bool constructTree(const char *file){
   /*
      save sphere-tree
   */
-  char sphereFile[1024];
-  sprintf(sphereFile, "%s-grid.sph", inputFile);
-  if (tree.saveSphereTree(sphereFile, 1.0f/boxScale)){
+  if (tree.saveSphereTree(output_file, 1.0f/boxScale)){
     Array<LevelEval> evals;
     if (eval){
       evaluateTree(&evals, tree, eval);
       writeEvaluation(stdout, evals);
       }
 
-    FILE *f = fopen(sphereFile, "a");
-    if (f){
-      fprintf(f, "\n\n");
-      fprintf(f, "Options : \n");
-      writeParam(stdout, intParams);
-      writeParam(stdout, boolParams);
-      fprintf(f, "\n\n");
-      writeEvaluation(f, evals);
-      fclose(f);
+    if (!yaml)
+    {
+      FILE *f = fopen(output_file.c_str (), "a");
+      if (f){
+        fprintf(f, "\n\n");
+        fprintf(f, "Options : \n");
+        writeParam(stdout, intParams);
+        writeParam(stdout, boolParams);
+        fprintf(f, "\n\n");
+        writeEvaluation(f, evals);
+        fclose(f);
       }
+    }
 
     return true;
     }

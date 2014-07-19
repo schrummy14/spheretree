@@ -80,16 +80,16 @@ class Surface{
     //  loading from Rhino file
     bool loadMesh(const CRhinoMesh &mesh);
 #endif
-    bool loadRhinoSurface(const char *fileName, char **err, float boxSize = -1);
+    bool loadRhinoSurface(const char *fileName, char **err, REAL boxSize = -1);
 
     //  fitting into unit box
     //  note: this translates the vertices
-    float fitIntoBox(float boxSize = 1000);
+    REAL fitIntoBox(REAL boxSize = 1000);
 
     //  our own format with edge adjacency
-    bool loadSurface(const char *fileName, float boxSize = -1);
-    bool loadMinimalSurface(const char *fileName, float boxSize = -1);
-    bool saveSurface(const char *fileName, float scale = 1);
+    bool loadSurface(const char *fileName, REAL boxSize = -1);
+    bool loadMinimalSurface(const char *fileName, REAL boxSize = -1);
+    bool saveSurface(const char *fileName, REAL scale = 1);
     bool saveHavokSurface(const char *fileName);
 
     //  normals
