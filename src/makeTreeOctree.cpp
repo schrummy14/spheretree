@@ -143,7 +143,9 @@ bool constructTree(const char *file){
   /*
       scale box
   */
-  float boxScale = sur.fitIntoBox(1000);
+  // FIXME: Disable scaling for now (wrong result if a transformation is applied after)
+  //float boxScale = sur.fitIntoBox(1000);
+  float boxScale = 1.;
 
   /*
       make sphere-tree
