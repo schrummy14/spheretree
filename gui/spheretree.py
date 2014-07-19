@@ -69,7 +69,8 @@ def algo_list():
     """
     return {"grid", "hubbard", "medial", "octree", "spawn"}
 
-def create_sch(dae_file=None, obj_file=None, algo="grid", depth=3, branch=8):
+def create_sch(dae_file=None, obj_file=None, algo="grid", depth=3, branch=8,
+               force=False):
     """
     Create a SCH file from a DAE (Collada) or OBJ (Wavefront) file.
     Requires meshlab for DAE to OBJ conversion.
@@ -108,7 +109,7 @@ def create_sch(dae_file=None, obj_file=None, algo="grid", depth=3, branch=8):
     # Second: process OBJ with spheretree
     result_file = "/tmp/%s-%s.sph" % (name, algo)
     exec_name = "makeTree%s" % algo.capitalize()
-    if not os.path.exists(result_file):
+    if not os.path.exists(result_file) or force:
         command = "%s -nopause -branch %i -depth %i %s" \
                   % (exec_name, branch, depth, tmp_file)
         p = Popen(command, shell = True, stdin = sys.stdin, stdout = PIPE, stderr = PIPE, bufsize = 1)
@@ -130,9 +131,6 @@ def display_collada(dae_file):
 
     from collada import Collada, DaeUnsupportedError, DaeBrokenRefError
     mesh = Collada(dae_file, ignore=[DaeUnsupportedError, DaeBrokenRefError])
-
-    for node in mesh.scene.nodes:
-        print(node.transforms)
 
     for geometry in mesh.scene.objects('geometry'):
         for prim in geometry.primitives():
@@ -195,6 +193,9 @@ parser.add_option('-d', '--depth', default=3, type=int, metavar='depth',
                   help='Depth of the sphere-tree.')
 parser.add_option('-b', '--branch', default=8, type=int, metavar='branch',
                   help='Branching factor of the sphere-tree.')
+parser.add_option('-f', '--force', metavar='force',
+                  action='store_true', default=False,
+                  help='Whether to force the overwrite of existing files.')
 parser.add_option('-a', '--algo', default=default_algo, type=str,
                   metavar='algo', help='Construction algorithm.')
 
@@ -203,6 +204,7 @@ input_file = args[0]
 sph_depth = options.depth
 sph_branch = options.branch
 sph_level = min(options.level, sph_depth)
+force = options.force
 algo = options.algo
 
 if not algo in algo_list:
@@ -223,11 +225,13 @@ sphere_opacity = 0.5
 if from_dae:
     # Compute SCH result from DAE file
     sph_file = create_sch(dae_file=input_file, algo=algo,
-                          depth=sph_depth, branch=sph_branch)
+                          depth=sph_depth, branch=sph_branch,
+                          force=force)
 elif from_obj:
     # Compute SCH result from OBJ file
     sph_file = create_sch(obj_file=input_file, algo=algo,
-                          depth=sph_depth, branch=sph_branch)
+                          depth=sph_depth, branch=sph_branch,
+                          force=force)
 else:
     sph_file = input_file
     sphere_opacity = 1.0
