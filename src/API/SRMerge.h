@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -39,7 +39,7 @@
 /*
     SphereSetReducer which uses merging algorithm
 
-    Beneficial Merges (i.e. those with reduce error) DOESN'T work well for the 
+    Beneficial Merges (i.e. those with reduce error) DOESN'T work well for the
     merge algorithm and therefore is OFF by default.
 */
 #ifndef _API_MERGE_SPHERE_REDUCER_H_
@@ -73,15 +73,15 @@ class SRMerge : public SRVoronoi{
     SRMerge();
 
     //  reduce sphere set
-    virtual void getSpheres(Array<Sphere> *spheres, int n, const SurfaceRep &surRep, const Sphere *filterSphere = NULL, float parSphereErr = -1) const;
+    virtual void getSpheres(Array<Sphere> *spheres, int n, const SurfaceRep &surRep, const Sphere *filterSphere = NULL, REAL parSphereErr = -1) const;
 
   private:
     //  internals
     struct Merger{
       int i1, i2;
       Sphere s;
-      float cost;
-      float newErr;
+      REAL cost;
+      REAL newErr;
       };
 
     void constructMerger(Merger *merger, const Array<MedialSphere> &medialSpheres, const Array<Surface::Point> *surPts, int i1, int i2) const;

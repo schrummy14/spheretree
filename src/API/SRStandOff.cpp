@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -50,13 +50,13 @@ SRStandOff::SRStandOff(){
 }
 
 // this algorithm uses the binary search
-void SRStandOff::getSpheresA(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, float parSphErr) const{
+void SRStandOff::getSpheresA(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, REAL parSphErr) const{
   if (!setupFilterSphere(filterSphere, parSphErr, &surRep))
     return;
 
   //  phase one - work out the upper bound
   Array<Sphere> tmpSph;
-  float lowerErr = 0, upperErr = errStep;
+  REAL lowerErr = 0, upperErr = errStep;
   while (true){
     OUTPUTINFO("upperErr = %f\n", upperErr);
     bool flag = generateStandOffSpheres(&tmpSph, upperErr, surRep, numDest, useIterativeSelect? 2:0, filterSphere);
@@ -68,10 +68,10 @@ void SRStandOff::getSpheresA(Array<Sphere> *spheres, int numDest, const SurfaceR
     }
 
   //  phase two - binary search
-  float lastGoodError = upperErr;
+  REAL lastGoodError = upperErr;
   while (true){
-    float nextErr = (upperErr + lowerErr) / 2.0f;
-    float errRange = upperErr - lowerErr;
+    REAL nextErr = (upperErr + lowerErr) / 2.0f;
+    REAL errRange = upperErr - lowerErr;
 
     OUTPUTINFO("**************************\n");
     OUTPUTINFO("err  \t: %f\n", nextErr);
@@ -107,19 +107,19 @@ void SRStandOff::getSpheresA(Array<Sphere> *spheres, int numDest, const SurfaceR
 }
 
 //  this is the original search algorithm - has been replaced with binary search for now
-void SRStandOff::getSpheresB(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, float parSphErr) const{
+void SRStandOff::getSpheresB(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, REAL parSphErr) const{
   if (!setupFilterSphere(filterSphere, parSphErr, &surRep))
     return;
 
   //  iterative adaptive algorithm to find the error number requried
   //  to generate the correct number of spheres
   Array<Sphere> tmpSph;
-  float delta = errStep;
-  float errBelow = startErr, errAbove = REAL_MAX;
+  REAL delta = errStep;
+  REAL errBelow = startErr, errAbove = REAL_MAX;
   while (true){
     OUTPUTINFO("*********************\n");
     int numSph;
-    float nextErr = errBelow+delta;
+    REAL nextErr = errBelow+delta;
 
     if (nextErr >= errAbove){
       //  will result in <= numDest
@@ -187,6 +187,6 @@ void SRStandOff::getSpheresB(Array<Sphere> *spheres, int numDest, const SurfaceR
   ((SRStandOff*)this)->lastStandoff = errAbove;  //  hack for graphing performance
 }
 
-void SRStandOff::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, float parSphErr) const{
+void SRStandOff::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, REAL parSphErr) const{
   getSpheresB(spheres, numDest, surRep, filterSphere, parSphErr);
 }

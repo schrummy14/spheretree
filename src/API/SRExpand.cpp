@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -72,7 +72,7 @@ void SRExpand::setupForLevel(int level, int degree, const SurfaceRep *surRep) co
 }
 
 //  overload this to get the spheres
-bool SRExpand::generateStandOffSpheres(Array<Sphere> *spheres, float err, const SurfaceRep &surRep, int  maxNum, int tryIter, const Sphere *parSph) const{
+bool SRExpand::generateStandOffSpheres(Array<Sphere> *spheres, REAL err, const SurfaceRep &surRep, int  maxNum, int tryIter, const Sphere *parSph) const{
   CHECK_DEBUG(redElim != NULL, "need redundency eliminator");
   spheres->setSize(0);
 
@@ -101,11 +101,11 @@ bool SRExpand::generateStandOffSpheres(Array<Sphere> *spheres, float err, const 
       selSph.addItem() = expSph.index(sel.index(i));
       }
 
-    float selColor[] = {1,0,0};
+    REAL selColor[] = {1,0,0};
     sprintf(buffer, "c:/devel/expandPics/expand-%.4d-B.pov", frame);
     exportSpheresPOV(buffer, selSph, 1.0f/1000.0f, true, NULL, &fakeSel, selColor);
 */
-    return ok; 
+    return ok;
     }
   else{
     //  setup eliminator
@@ -141,7 +141,7 @@ bool SRExpand::generateStandOffSpheres(Array<Sphere> *spheres, float err, const 
     }
 }
 
-void SRExpand::generateExpandedSpheres(Array<Sphere> *dest, float err, const Sphere *parSph) const{
+void SRExpand::generateExpandedSpheres(Array<Sphere> *dest, REAL err, const Sphere *parSph) const{
   CHECK_DEBUG0(mt != NULL);
 
   //  reset base set of spheres
@@ -156,8 +156,8 @@ void SRExpand::generateExpandedSpheres(Array<Sphere> *dest, float err, const Sph
       Point3D pClose;
       mt->closestPoint(&pClose, vert);
 
-      float d = pClose.distance(vert->s.c);
-      float newR = d + err;
+      REAL d = pClose.distance(vert->s.c);
+      REAL newR = d + err;
       if (vert->flag == VOR_FLAG_COVER){
         newR = err - d;
         if (newR < 0)
@@ -172,7 +172,7 @@ void SRExpand::generateExpandedSpheres(Array<Sphere> *dest, float err, const Sph
     }
 }
 
-bool SRExpand::setupFilterSphere(const Sphere *filterSphere, float parSphereErr, const SurfaceRep *surRep) const{
+bool SRExpand::setupFilterSphere(const Sphere *filterSphere, REAL parSphereErr, const SurfaceRep *surRep) const{
   //  FOR : update diagram using filter sphere
   if (mt && vor && parSphereErr > 0 && filterSphere){
     VFAdaptive adaptive;
@@ -182,7 +182,7 @@ bool SRExpand::setupFilterSphere(const Sphere *filterSphere, float parSphereErr,
       adaptive.mt = mt;
       }
 
-    float destErr = parSphereErr / errorDecreaseFactor;
+    REAL destErr = parSphereErr / errorDecreaseFactor;
     OUTPUTINFO("Updating VORONOI... (DestErr = %f)\n", destErr);
     vorAdaptPtr->adaptiveSample(vor, destErr, -1, -1, minSpheresPerNode, surRep, filterSphere, true, maxItersForVoronoi);
     }

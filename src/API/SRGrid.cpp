@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -49,7 +49,7 @@ SRGrid::SRGrid(){
   pickMostSph = false;
 }
 
-void SRGrid::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, float parSphErr) const{
+void SRGrid::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, REAL parSphErr) const{
   //CHECK_DEBUG0(numDest >= 8);
   CHECK_DEBUG0(sphereEval != NULL);
 
@@ -115,7 +115,7 @@ void SRGrid::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &s
 
   if (!useQuickTest){
     double lastVals[10], lastSize;
-    int lastNum = 0, curNum = 0;  //  need 0 for limit 
+    int lastNum = 0, curNum = 0;  //  need 0 for limit
 
     //  iteratively reduce the size of the grid
     while (optInfo.size > 0.1 * initSize && curNum <= numDest){
@@ -153,7 +153,7 @@ void SRGrid::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &s
         optimiseForError(lastVals, &optInfo);
         optInfo.size *= lastVals[6];
         }
-    
+
       //  evaluate error and record if best fit sofar
       double err = generateSpheresAndEval(&sph, surRep, lastVals, optInfo);
       OUTPUTINFO("Err = %f\n", err);
@@ -202,7 +202,7 @@ void SRGrid::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &s
           OUTPUTINFO("New Best : %d (%f)\n", count, err);
           bestErr = err;
           bestSize = optInfo.size;
-          memcpy(bestVals, curVals, 6*sizeof(curVals[0]));    
+          memcpy(bestVals, curVals, 6*sizeof(curVals[0]));
           }
         }
       }
@@ -217,7 +217,7 @@ void SRGrid::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &s
       optimiseForError(bestVals, &optInfo);
       optInfo.size *= bestVals[6];
       }
-    
+
     //  evaluate error and record if best fit sofar
     generateSpheres(spheres, surRep, bestVals, optInfo);
     double err = evalFit(*spheres);
@@ -359,7 +359,7 @@ void SRGrid::getBounds(Point3D *pMin, Point3D *pMax, const SurfaceRep &surRep, c
   for (int i = 0; i < numPts; i++){
     Point3D pT;
     tr.transform(&pT, surPts->index(i).p);
-    
+
     pMin->storeMin(pT);
     pMax->storeMax(pT);
     }
@@ -415,7 +415,7 @@ void SRGrid::generateSphereSet(Array<Sphere> *sph, const Point3D &cMin, int dim[
     }
 }
 
-void SRGrid::generateSpheresCover(Array<Sphere> *spheres, const SurfaceRep &surRep, 
+void SRGrid::generateSpheresCover(Array<Sphere> *spheres, const SurfaceRep &surRep,
                                   const Transform3D &tr, const Point3D &pCcube, double size){
   //  get bounds of transformed points
   Point3D pMin, pMax;
@@ -430,11 +430,11 @@ void SRGrid::generateSpheresCover(Array<Sphere> *spheres, const SurfaceRep &surR
   generateSphereSet(spheres, cMin, dim, tr, size);
 }
 
-void SRGrid::generateSpheres(Array<Sphere> *spheres, const SurfaceRep &surRep, 
+void SRGrid::generateSpheres(Array<Sphere> *spheres, const SurfaceRep &surRep,
                              double vals[10], const OptInfo &optInfo){
   //  generate transform
   Transform3D tR;
-  makeTransform(&tR, optInfo.pCrot, vals);  
+  makeTransform(&tR, optInfo.pCrot, vals);
 
   //  make spheres
   Point3D pCcube;
@@ -451,11 +451,11 @@ void SRGrid::generateSpheres(Array<Sphere> *spheres, const SurfaceRep &surRep,
   elimin.reduceSpheres(spheres, tmpSph, surRep, -1);
 }
 
-double SRGrid::generateSpheresAndEval(Array<Sphere> *spheres, const SurfaceRep &surRep, 
+double SRGrid::generateSpheresAndEval(Array<Sphere> *spheres, const SurfaceRep &surRep,
                                     double vals[10], const OptInfo &optInfo) const{
   //  generate transform
   Transform3D tR;
-  makeTransform(&tR, optInfo.pCrot, vals);  
+  makeTransform(&tR, optInfo.pCrot, vals);
 
   //  make spheres
   Point3D pCcube;
@@ -483,7 +483,7 @@ double SRGrid::sphereNumberFunc(double vals[], void *data, int *canFinish){
 
   //  generate transform
   Transform3D tR;
-  makeTransform(&tR, optInfo->pCrot, vals);  
+  makeTransform(&tR, optInfo->pCrot, vals);
 
   //  make spheres
   Point3D pCcube;
@@ -524,10 +524,10 @@ double SRGrid::sphereNumberFunc(double vals[], void *data, int *canFinish){
     evaluate the given solution for error
 */
 double SRGrid::evalFit(const Array<Sphere> &sph) const{
-  float worstErr = 0;
+  REAL worstErr = 0;
   int numSph = sph.getSize();
   for (int i = 0; i < numSph; i++){
-    float err = sphereEval->evalSphere(sph.index(i));
+    REAL err = sphereEval->evalSphere(sph.index(i));
     if (err > worstErr)
       worstErr = err;
     }
@@ -535,8 +535,8 @@ double SRGrid::evalFit(const Array<Sphere> &sph) const{
   return worstErr;
 }
 
-double SRGrid::evalFitCover(const SurfaceRep &surRep, const Transform3D &tr, 
-                            const Point3D &pCcube, float size, int *numReqSph, int maxNum) const{
+double SRGrid::evalFitCover(const SurfaceRep &surRep, const Transform3D &tr,
+                            const Point3D &pCcube, REAL size, int *numReqSph, int maxNum) const{
   //  generate the set of spheres
   Array<Sphere> sph1, sph2;
   generateSpheresCover(&sph1, surRep, tr, pCcube, size);
@@ -563,7 +563,7 @@ double SRGrid::sphereFitFunc(double vals[], void *data, int *canFinish){
   SRGrid::OptInfo *optInfo = (OptInfo*) data;
 
   double initSize = optInfo->size;
-  optInfo->size *= vals[6]; 
+  optInfo->size *= vals[6];
 
   Array<Sphere> sph;
   double err = optInfo->that->generateSpheresAndEval(&sph, *optInfo->surRep, vals, *optInfo);
@@ -584,7 +584,7 @@ double SRGrid::computeVolume(Vector3D v[3], const SurfaceRep &surRep){
   int numPts = pts->getSize();
   if (numPts == 0)
     return 0;
-  
+
   double minT[3] = {0,0,0};
   double maxT[3] = {0,0,0};
   Point3D q = pts->index(0).p;
@@ -630,7 +630,7 @@ void SRGrid::computeOBB(Vector3D v[3], const SurfaceRep &surRep){
   makeRotation(&tr, vals);
   Transform3D trI;
   trI.invertAffine(tr);
-  
+
   //  transform basis vectors
   trI.transform(&v[0], Vector3D::X);
   trI.transform(&v[1], Vector3D::Y);
@@ -646,7 +646,7 @@ double SRGrid::obbVolFunc(double vals[], void *data, int *canFinish){
   makeRotation(&tr, vals);
   Transform3D trI;
   trI.invertAffine(tr);
-  
+
   //  transform basis vectors
   Vector3D v[3];
   trI.transform(&v[0], Vector3D::X);

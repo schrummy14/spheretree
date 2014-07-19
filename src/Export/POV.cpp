@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -39,7 +39,7 @@
 #include "POV.h"
 #include <stdio.h>
 
-bool exportSpheresPOV(const char *fileName, const Array<Sphere> &sph, float scale, bool useDefFile, float *m, Array<int> *sel, float selColor[], Array<int> *sel1, float selColor1[]){
+bool exportSpheresPOV(const char *fileName, const Array<Sphere> &sph, REAL scale, bool useDefFile, REAL *m, Array<int> *sel, REAL selColor[], Array<int> *sel1, REAL selColor1[]){
   //  open file
   FILE *f = fopen(fileName, "w");
   if (!f)
@@ -60,7 +60,7 @@ bool exportSpheresPOV(const char *fileName, const Array<Sphere> &sph, float scal
       fprintf(f, "  #declare SELCOLOR= rgb<%f, %f, %f> \n", selColor[0], selColor[1], selColor[2]);
     else
       fprintf(f, "  #declare SELCOLOR= rgb<1, 0, 0> \n");
-    fprintf(f, "#end\n"); 
+    fprintf(f, "#end\n");
     }
 
   if (sel1){
@@ -69,12 +69,12 @@ bool exportSpheresPOV(const char *fileName, const Array<Sphere> &sph, float scal
       fprintf(f, "  #declare SELCOLOR1= rgb<%f, %f, %f> \n", selColor1[0], selColor1[1], selColor1[2]);
     else
       fprintf(f, "  #declare SELCOLOR1= rgb<0, 1, 0> \n");
-    fprintf(f, "#end\n"); 
+    fprintf(f, "#end\n");
     }
 
   //  start spheres
   fprintf(f, "union {\n");
-  
+
   //  dunp spheres
   int numSph = sph.getSize();
   for (int i = 0; i < numSph; i++){
@@ -93,7 +93,7 @@ bool exportSpheresPOV(const char *fileName, const Array<Sphere> &sph, float scal
   fprintf(f, "  #ifdef (YROT)\n    rotate<0, YROT, 0>\n  #end\n");
   fprintf(f, "  #ifdef (ZROT)\n    rotate<0, 0, ZROT>\n  #end\n");
 
-  //  matrix 
+  //  matrix
   if (m){
     fprintf(f, " matrix <");
     for (int i = 0; i < 12; i++){
@@ -108,7 +108,7 @@ bool exportSpheresPOV(const char *fileName, const Array<Sphere> &sph, float scal
     }
 
   //  finish
-  fprintf(f, "  #ifdef (COLOR)\n    pigment { COLOR }\n  #else\n    pigment { rgb <0.75,0.75,0> }\n  #end\n"); 
+  fprintf(f, "  #ifdef (COLOR)\n    pigment { COLOR }\n  #else\n    pigment { rgb <0.75,0.75,0> }\n  #end\n");
   fprintf(f, "  finish { diffuse 0.9 ambient 0 specular 0 }\n");
   fprintf(f, "  #ifdef (SCALE)\n    scale SCALE\n  #end\n");
 
@@ -132,7 +132,7 @@ bool exportSpheresPOV(const char *fileName, const Array<Sphere> &sph, float scal
   return true;
 }
 
-bool exportModelPOV(const char *fileName, const Surface &sur, float scale){
+bool exportModelPOV(const char *fileName, const Surface &sur, REAL scale){
   //  open file
   FILE *f = fopen(fileName, "w");
   if (!f)
@@ -164,7 +164,7 @@ bool exportModelPOV(const char *fileName, const Surface &sur, float scale){
 }
 
 
-bool exportSphereTreePOV(const char *fileName, const SphereTree &st, bool topLevel, float scale, bool useDefFile){
+bool exportSphereTreePOV(const char *fileName, const SphereTree &st, bool topLevel, REAL scale, bool useDefFile){
   //  open file
   FILE *f = fopen(fileName, "w");
   if (!f)
@@ -180,7 +180,7 @@ bool exportSphereTreePOV(const char *fileName, const SphereTree &st, bool topLev
     fprintf(f, "#include \"defs.inc\"\n");
 
   //  write out the level one spheres
-  float colors[][3] = {{1,0,0}, {0,1,0}, {0,0,1}, {1, 0.5, 0}, {1,0,1}, {0,1,1}, {1, 0.5, 0.5}, {1, 1, 0}, {0.5, 0.5, 1}};
+  REAL colors[][3] = {{1,0,0}, {0,1,0}, {0,0,1}, {1, 0.5, 0}, {1,0,1}, {0,1,1}, {1, 0.5, 0.5}, {1, 1, 0}, {0.5, 0.5, 1}};
   const int numColors = 9;
 
   if (topLevel){
@@ -218,7 +218,7 @@ bool exportSphereTreePOV(const char *fileName, const SphereTree &st, bool topLev
     for (int i = 0; i < num; i++){
       // child sphere less the bits that overlap (other spheres - parent)
       fprintf(f, "  difference {\n");
-      
+
       //  union of children
       fprintf(f, "    union{\n");
       int firstChild = st.getFirstChild(start+i);
@@ -227,7 +227,7 @@ bool exportSphereTreePOV(const char *fileName, const SphereTree &st, bool topLev
         if (s.r > 0){
 	  fprintf(f, "      sphere { ");
 	  fprintf(f, "<%f, %f, %f>, %f ", s.c.x*scale, s.c.y*scale, s.c.z*scale, s.r*scale);
-	  fprintf(f, "}\n");  
+	  fprintf(f, "}\n");
 	}
       }
       fprintf(f, "      }\n");
@@ -242,7 +242,7 @@ bool exportSphereTreePOV(const char *fileName, const SphereTree &st, bool topLev
         if (s.r > 0 && k != i){
 	  fprintf(f, "        sphere { ");
 	  fprintf(f, "<%f, %f, %f>, %f ", s.c.x*scale, s.c.y*scale, s.c.z*scale, s.r*scale);
-	  fprintf(f, "}\n");  
+	  fprintf(f, "}\n");
 	}
       }
       fprintf(f, "        }\n");

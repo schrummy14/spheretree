@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -44,9 +44,9 @@ const Sphere Sphere::ZERO = {0,0,0,0};
 const Sphere Sphere::UNIT = {0,0,0,1};
 const Sphere Sphere::INVALID = {0,0,0,-1};
 
-float Sphere::overlapVolume(const Sphere &other) const{
-  float d = this->c.distance(other.c);
-  float r1 = this->r, r2 = other.r;
+REAL Sphere::overlapVolume(const Sphere &other) const{
+  REAL d = this->c.distance(other.c);
+  REAL r1 = this->r, r2 = other.r;
   if (r1 > r2){
     r1 = other.r;
     r2 = this->r;
@@ -56,26 +56,26 @@ float Sphere::overlapVolume(const Sphere &other) const{
     return 0.0f;                              //  no overlap
     }
   else if (d <= r2-r1 || d < EPSILON){
-    float r13 = r1*r1*r1;
-    float v = 4.0*M_PI*r13/3.0f;              //  small sphere fully contained
+    REAL r13 = r1*r1*r1;
+    REAL v = 4.0*M_PI*r13/3.0f;              //  small sphere fully contained
     return v;
     }
   else{
-    float r13 = r1*r1*r1;
-    float r23 = r2*r2*r2;
-    float x1 = (d*d + r1*r1 - r2*r2)/(2.0*d);
-    float x2 = d - x1;
-    float v = 2*M_PI*(r13+r23)/3.0f  - M_PI*(r1*r1*x1 + r2*r2*x2 - x1*x1*x1/3.0f - x2*x2*x2/3.0f);
+    REAL r13 = r1*r1*r1;
+    REAL r23 = r2*r2*r2;
+    REAL x1 = (d*d + r1*r1 - r2*r2)/(2.0*d);
+    REAL x2 = d - x1;
+    REAL v = 2*M_PI*(r13+r23)/3.0f  - M_PI*(r1*r1*x1 + r2*r2*x2 - x1*x1*x1/3.0f - x2*x2*x2/3.0f);
     return v;
-    }  
+    }
   }
 
 int Sphere::intersectRay(double t[2], const Point3D &rayOrigin, const Vector3D &rayDirn) const{
   Vector3D oc;
   oc.difference(rayOrigin, c);
-  float b = oc.dot(rayDirn);
-  float c = oc.dot(oc) - r*r;
-  float d = b*b-c;
+  REAL b = oc.dot(rayDirn);
+  REAL c = oc.dot(oc) - r*r;
+  REAL d = b*b-c;
 
   if (d < 0)
     return 0;
@@ -84,7 +84,7 @@ int Sphere::intersectRay(double t[2], const Point3D &rayOrigin, const Vector3D &
     return 1;
     }
   else{
-    float e = sqrt(d);
+    REAL e = sqrt(d);
     t[0] = -b - e;
     t[1] = -b + e;
 
@@ -100,21 +100,21 @@ bool Sphere::intersect(const Point3D &pMin, const Point3D &pMax) const{
   #define DO_AXIS(a)  \
     if (c.a < pMin.a){ \
       p.a = pMin.a; \
-      float s = c.a - pMin.a; \
+      REAL s = c.a - pMin.a; \
       d += s*s; \
       if (d > rS) \
         return false; \
       } \
     else if (c.a > pMax.a){ \
       p.a = pMax.a; \
-      float s = c.a - pMax.a; \
+      REAL s = c.a - pMax.a; \
       d += s*s; \
       if (d > rS) \
         return false; \
       }  \
 
-  float d = 0;
-  float rS = r*r;
+  REAL d = 0;
+  REAL rS = r*r;
   Point3D p;
   DO_AXIS(x);
   DO_AXIS(y);

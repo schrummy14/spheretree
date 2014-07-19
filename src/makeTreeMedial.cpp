@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -99,7 +99,7 @@ const IntParam intParams[] = {{"testerLevels", &testerLevels},
                               {"numCover", &numCoverPts},
                               {"minCover", &minCoverPts},
                               {"initSpheres", &initSpheres},
-                              {"minSpheres", &spheresPerNode}, 
+                              {"minSpheres", &spheresPerNode},
                               {NULL, NULL}};
 
 const FloatParam floatParams[] = {{"erFact", &erFact},
@@ -249,9 +249,9 @@ bool constructTree(const char *file){
      Setup voronoi diagram
   */
   Point3D pC;
-  pC.x = (sur.pMax.x + sur.pMin.x)/2.0f;  
-  pC.y = (sur.pMax.y + sur.pMin.y)/2.0f;  
-  pC.z = (sur.pMax.z + sur.pMin.z)/2.0f;  
+  pC.x = (sur.pMax.x + sur.pMin.x)/2.0f;
+  pC.y = (sur.pMax.y + sur.pMin.y)/2.0f;
+  pC.z = (sur.pMax.z + sur.pMin.z)/2.0f;
 
   Voronoi3D vor;
   vor.initialise(pC, 1.5f * sur.pMin.distance(pC));
@@ -360,7 +360,7 @@ bool constructTree(const char *file){
   balOpt.B = balExcess;
 
   /*
-      setup SphereTree constructor - using dynamic construction 
+      setup SphereTree constructor - using dynamic construction
   */
   STGGeneric treegen;
   treegen.eval = eval;

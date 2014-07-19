@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -47,7 +47,7 @@ VFAdaptive::VFAdaptive(){
   coverRep = NULL;
 }
 
-void VFAdaptive::adaptiveSample(Voronoi3D *vor, float maxErr, int maxSam, int maxSph, int minSph, const SurfaceRep *coverRep, const Sphere *filterSphere, bool countOnlyCoverSpheres, int maxLoop){
+void VFAdaptive::adaptiveSample(Voronoi3D *vor, REAL maxErr, int maxSam, int maxSph, int minSph, const SurfaceRep *coverRep, const Sphere *filterSphere, bool countOnlyCoverSpheres, int maxLoop){
   CHECK_DEBUG0(mt != NULL);
   const SurfaceRep *rep = coverRep;
   if (rep == NULL)
@@ -67,9 +67,9 @@ double VFAdaptive::getErr(Voronoi3D::Vertex *vert, const SEBase *eval, const Med
         OUTPUTINFO("GetErr : UNCATEGORISED POINT\n");
 
       //  evaluate fit
-      float dSur = pClose.distance(vert->s.c);
+      REAL dSur = pClose.distance(vert->s.c);
       if (vert->flag == VOR_FLAG_COVER){
-        vert->err = vert->s.r + dSur;    //  sphere center is outside surface 
+        vert->err = vert->s.r + dSur;    //  sphere center is outside surface
         }
       else{
         vert->err = vert->s.r - dSur;    //  sphere center is inside surface
@@ -85,9 +85,9 @@ double VFAdaptive::getErr(Voronoi3D::Vertex *vert, const SEBase *eval, const Med
   return vert->err;
 }
 
-int VFAdaptive::findWorstSphere(Voronoi3D *vor, const MedialTester &mt, const SEBase *eval, const Sphere *filterSphere, float *resultErr, int *numMedial, bool includeCover){
+int VFAdaptive::findWorstSphere(Voronoi3D *vor, const MedialTester &mt, const SEBase *eval, const Sphere *filterSphere, REAL *resultErr, int *numMedial, bool includeCover){
   int worstI = -1;
-  float errSofar = -1;
+  REAL errSofar = -1;
   int numInternal = 0;
 
   //  find the worst approximated point
@@ -100,7 +100,7 @@ int VFAdaptive::findWorstSphere(Voronoi3D *vor, const MedialTester &mt, const SE
 
     if (v->flag == VOR_FLAG_INTERNAL || (includeCover && v->flag == VOR_FLAG_COVER)){
       numInternal++;
-      float err = getErr(v, eval, &mt, vor);
+      REAL err = getErr(v, eval, &mt, vor);
       if (err > errSofar){
         errSofar = err;
         worstI = i;
@@ -155,19 +155,19 @@ void saveSpheres(Voronoi3D *vor, const MedialTester &mt, int sel){
     sprintf(buffer, "povs/adapt-%0.6d.pov", fn++);
     printf("Saving as : %s\n");
 
-    float selColor[3] = {1,0,0};
-    float selColor1[3] = {0,1,0};
-    float selColor2[3] = {1, 1, 0};
+    REAL selColor[3] = {1,0,0};
+    REAL selColor1[3] = {0,1,0};
+    REAL selColor2[3] = {1, 1, 0};
     exportSpheresPOV(buffer, spheres, 1.0/1000.0, true, NULL, &selList, sel < 0? selColor1:selColor, &selList1, selColor2);
   }
 }
 
-void VFAdaptive::adaptiveSample(Voronoi3D *vor, const MedialTester &mt, const SurfaceRep *coverRep, float maxErr, int maxSam, int maxSph, int minSph, const Sphere *filterSphere, const SEBase *eval, bool countOnlyCoverSpheres, int maxLoops){
+void VFAdaptive::adaptiveSample(Voronoi3D *vor, const MedialTester &mt, const SurfaceRep *coverRep, REAL maxErr, int maxSam, int maxSph, int minSph, const Sphere *filterSphere, const SEBase *eval, bool countOnlyCoverSpheres, int maxLoops){
   if (maxErr < 0.0f)
     return;
 
   //  find the worst approximated point
-  float errSofar;
+  REAL errSofar;
   findWorstSphere(vor, mt, eval, filterSphere, &errSofar, NULL, false);
   OUTPUTINFO("Initial Error Sofar : %f\n", errSofar);
 
@@ -189,7 +189,7 @@ void VFAdaptive::adaptiveSample(Voronoi3D *vor, const MedialTester &mt, const Su
 
     //  find the worst approximated point
     int numInt = 0;
-    float worstD = -1;
+    REAL worstD = -1;
     int worstI = findWorstSphere(vor, mt, eval, filterSphere, &worstD, &numInt, true);
     if (countOnlyCoverSpheres)
       numInt = numCover;
@@ -217,9 +217,9 @@ void VFAdaptive::adaptiveSample(Voronoi3D *vor, const MedialTester &mt, const Su
       OUTPUTINFO("NumSpheres : %4d  \tErr : %10.6f  \terrSofar : %10.6f\n", numInt, worstD, errSofar);
 
     if (errSofar < 0)                       //  first iteration to have some spheres
-      errSofar = worstD;  
+      errSofar = worstD;
 
-    //  is it worth continuing ?? 
+    //  is it worth continuing ??
     if (worstD < maxErr && numInt > minSph)
       break;
     else if ((maxSam > 0 && vor->formingPoints.getSize()-9 >= maxSam*2) ||
@@ -235,7 +235,7 @@ void VFAdaptive::adaptiveSample(Voronoi3D *vor, const MedialTester &mt, const Su
         for (int i = 0; i < numVerts; i++){
           Voronoi3D::Vertex *v = &vor->vertices.index(i);
           if (v->flag == VOR_FLAG_COVER){
-            float err = getErr(v, eval, &mt, vor);
+            REAL err = getErr(v, eval, &mt, vor);
             if (err > errSofar)
               v->flag = VOR_FLAG_EXTERNAL;
             }
@@ -260,7 +260,7 @@ void VFAdaptive::adaptiveSample(Voronoi3D *vor, const MedialTester &mt, const Su
     Voronoi3D::Vertex *v = &vor->vertices.index(worstI);
     mt.blockMedial(v);
 
-    //  get the closest surface point to the vertex 
+    //  get the closest surface point to the vertex
     Vector3D n;
     Point3D pClose;
     mt.closestPointNormal(&pClose, &n, v);

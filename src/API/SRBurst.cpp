@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -55,7 +55,7 @@ SRBurst::SRBurst(){
 }
 
 //  reduce sphere set
-void SRBurst::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, float parSphereErr) const{
+void SRBurst::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, REAL parSphereErr) const{
   CHECK_DEBUG0(spheres != NULL);
   CHECK_DEBUG(sphereFitter != NULL, "need a sphere fitter");
   CHECK_DEBUG(sphereEval != NULL, "need a sphere evaluator");
@@ -119,7 +119,7 @@ void SRBurst::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &
       }
 
     int bestI = -1;
-    float minCost = -1;
+    REAL minCost = -1;
     if (useBeneficial){
       //  find the worst sphere that makes an improvement
       double worstImprovedError = 0;
@@ -188,13 +188,13 @@ void SRBurst::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &
       spheres->addItem() = medialSpheres.index(i).s;
 }
 
-float SRBurst::costOfRemoval(SphereRemove &removal, const Array<MedialSphere> &medialSpheres, int sI, const Array<Surface::Point> &surPts) const{
+REAL SRBurst::costOfRemoval(SphereRemove &removal, const Array<MedialSphere> &medialSpheres, int sI, const Array<Surface::Point> &surPts) const{
   //  get info
   const MedialSphere *medSph = &medialSpheres.index(sI);
   int numPts = medSph->pts.getSize();
 
   //  compute the new bounding spheres for each neighbour
-  float maxCost = 0, sumAllErr = 0;
+  REAL maxCost = 0, sumAllErr = 0;
   int numNeigh = medSph->neighbours.getSize();
   for (int i = 0; i < numNeigh; i++){
     //  sphere for eval
@@ -217,9 +217,9 @@ float SRBurst::costOfRemoval(SphereRemove &removal, const Array<MedialSphere> &m
     //  eval cost
     if (haveNew){
       Sphere newS;
-      float cost = refitSphere(&newS, surPts, sphPts, sphereEval, sphereFitter, &testS->s.c);
+      REAL cost = refitSphere(&newS, surPts, sphPts, sphereEval, sphereFitter, &testS->s.c);
 
-      //  add to total error 
+      //  add to total error
       sumAllErr += COST_FN(cost);
 
       // subtract existing error as it will be added again later
@@ -234,7 +234,7 @@ float SRBurst::costOfRemoval(SphereRemove &removal, const Array<MedialSphere> &m
   //  add the rest of the errors
 /*  int numSph = medialSpheres.getSize();  //  TEMP  --  only count updated spheres
   for (i = 0; i < numSph; i++){
-    float err = medialSpheres.index(i).error;
+    REAL err = medialSpheres.index(i).error;
     sumAllErr += COST_FN(err);
     }*/
 
@@ -271,7 +271,7 @@ void SRBurst::constructRemoval(SphereRemove *removal, const Array<MedialSphere> 
         minSph = sphNum;
         break;
         }
-      float d = pTest.distance(testS->s.c) - testS->s.r;
+      REAL d = pTest.distance(testS->s.c) - testS->s.r;
       if (d < minD){
         minD = d;
         minSph = sphNum;
@@ -432,7 +432,7 @@ void SRBurst::makeAllNeighbours(Array<SphereRemove> *removals, Array<MedialSpher
     if (!s1->valid)
       continue;
 
-    //  check against other spheres  
+    //  check against other spheres
     for (int j = i+1; j < numSph; j++){
       MedialSphere *s2 = &medialSpheres->index(j);
       if (!s2->valid)
@@ -450,8 +450,8 @@ void SRBurst::makeAllNeighbours(Array<SphereRemove> *removals, Array<MedialSpher
 }
 
 void SRBurst::saveImagePre(const Array<MedialSphere> &medialSpheres, const Array<int> &ptList, int remNum, int maxNum) const{
-  float selCol1[] = {1, 1, 0};
-  float selCol2[] = {0, 1, 0};
+  REAL selCol1[] = {1, 1, 0};
+  REAL selCol2[] = {0, 1, 0};
 
   char buffer[1024];
   Array<int> sel, selRem;
@@ -492,7 +492,7 @@ void SRBurst::saveImagePre(const Array<MedialSphere> &medialSpheres, const Array
 }
 
 void SRBurst::saveImagePost(const Array<MedialSphere> &medialSpheres, const Array<int> &ptList, int remNum, int maxNum) const{
-  float selCol2[] = {0, 1, 0};
+  REAL selCol2[] = {0, 1, 0};
 
   Array<int> sel;
   Array<Sphere> spheres;

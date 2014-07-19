@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -50,7 +50,7 @@ void SRSpawn::setup(const SurfaceTester &st, const SEBase *se){
   this->eval = se;
 }
 
-bool SRSpawn::generateSpheres(Array<Sphere> *sph, float err, const SurfaceRep &surRep, int  maxNum, float maxRad) const{
+bool SRSpawn::generateSpheres(Array<Sphere> *sph, REAL err, const SurfaceRep &surRep, int  maxNum, REAL maxRad) const{
   CHECK_DEBUG(st != NULL, "need tester");
 
   const Array<Surface::Point> *surPts = surRep.getSurPts();
@@ -134,7 +134,7 @@ bool SRSpawn::generateSpheres(Array<Sphere> *sph, float err, const SurfaceRep &s
     if (newCover < 2){
       needNew = true;
       }
-    else{  
+    else{
       //  flag covered points
       surRep.flagContainedPoints(&cont, newS, &cont);
       numCont += newCover;
@@ -150,7 +150,7 @@ bool SRSpawn::generateSpheres(Array<Sphere> *sph, float err, const SurfaceRep &s
   return true;
 }
 
-bool SRSpawn::generateStandOffSpheres(Array<Sphere> *sph, float err, const SurfaceRep &surRep, int  maxNum, int tryIter, const Sphere *parSph) const{
+bool SRSpawn::generateStandOffSpheres(Array<Sphere> *sph, REAL err, const SurfaceRep &surRep, int  maxNum, int tryIter, const Sphere *parSph) const{
   if (tryIter == 0){
     return generateSpheres(sph, err, surRep, maxNum);
     }
@@ -170,16 +170,16 @@ bool SRSpawn::generateStandOffSpheres(Array<Sphere> *sph, float err, const Surfa
 
       while (true){
         //  find the maximum radius of the current set of spheres
-        float maxR = -1;
+        REAL maxR = -1;
         int numSpheres = tmpSph.getSize();
         for (int i = 0; i < numSpheres; i++){
-          float r = tmpSph.index(i).r;
+          REAL r = tmpSph.index(i).r;
           if (r > maxR)
             maxR = r;
           }
 
         //  generate the set of spheres with new max radius
-        float newMaxR = 0.9995*maxR - EPSILON_LARGE;
+        REAL newMaxR = 0.9995*maxR - EPSILON_LARGE;
         if (!generateSpheres(&tmpSph, err, surRep, maxNum+5, newMaxR))
           break;
 
@@ -200,13 +200,13 @@ bool SRSpawn::generateStandOffSpheres(Array<Sphere> *sph, float err, const Surfa
     }
 }
 
-Sphere SRSpawn::makeSphereSpawn(double vals[4], float maxErr, const SurfaceTester &st){
+Sphere SRSpawn::makeSphereSpawn(double vals[4], REAL maxErr, const SurfaceTester &st){
   Sphere newS;
   newS.c.x = vals[0];
   newS.c.y = vals[1];
   newS.c.z = vals[2];
 
-  float newR = 0;
+  REAL newR = 0;
   Point3D pClose;
   bool internal = st.insideSurface(&pClose, newS.c);
   CHECK_DEBUG0(finite(pClose.x + pClose.y + pClose.z));

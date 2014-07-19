@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -58,7 +58,7 @@ class SRGrid : public SRBase{
     void setupForLevel(int level, int degree, const SurfaceRep *surRep = NULL) const{}
 
     //  get spheres
-    void getSpheres(Array<Sphere> *spheres, int n, const SurfaceRep &surRep, const Sphere *filterSphere = NULL, float parSphErr = -1) const;
+    void getSpheres(Array<Sphere> *spheres, int n, const SurfaceRep &surRep, const Sphere *filterSphere = NULL, REAL parSphErr = -1) const;
 
     //  OBB computation
     static void computeOBB(Vector3D v[3], const SurfaceRep &surRep);
@@ -86,7 +86,7 @@ class SRGrid : public SRBase{
       };
     static double sphereNumberFunc(double vals[], void *data, int *canFinish);
     static double sphereFitFunc(double vals[], void *data, int *canFinish);
-    double evalFitCover(const SurfaceRep &surRep, const Transform3D &tr, const Point3D &pC, float size, int *numReqSph = NULL, int maxNum = -1) const;
+    double evalFitCover(const SurfaceRep &surRep, const Transform3D &tr, const Point3D &pC, REAL size, int *numReqSph = NULL, int maxNum = -1) const;
     double evalFit(const Array<Sphere> &sph) const;
     static void optimiseForError(double vals[6], OptInfo *optInfo);
     static void getGridTransform(double vals[6], double initOri[3], OptInfo *optInf);

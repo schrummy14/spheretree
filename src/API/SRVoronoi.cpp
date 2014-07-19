@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -76,7 +76,7 @@ void SRVoronoi::setupForLevel(int level, int degree, const SurfaceRep *surRep) c
 }
 
 //  internal
-void SRVoronoi::constructSphereSet(Array<MedialSphere> *medialSpheres, const SurfaceRep &surRep, const Sphere *filterSphere, float parSphereErr, bool onlyOneSpherePerPoint) const{
+void SRVoronoi::constructSphereSet(Array<MedialSphere> *medialSpheres, const SurfaceRep &surRep, const Sphere *filterSphere, REAL parSphereErr, bool onlyOneSpherePerPoint) const{
   CHECK_DEBUG(vor != NULL || srcSph != NULL, "need voronoi diagram or source spheres");
   const Array<Surface::Point> *surPts = surRep.getSurPts();  // will be null if using forming points
 
@@ -89,7 +89,7 @@ void SRVoronoi::constructSphereSet(Array<MedialSphere> *medialSpheres, const Sur
       adaptive.mt = mt;
       }
 
-    float destErr = parSphereErr / errorDecreaseFactor;
+    REAL destErr = parSphereErr / errorDecreaseFactor;
     OUTPUTINFO("Updating VORONOI... (DestErr = %f)\n", destErr);
     vorAdaptPtr->adaptiveSample(vor, destErr, -1, -1, minSpheresPerNode, &surRep, filterSphere, true, maxItersForVoronoi);
     }
@@ -214,10 +214,10 @@ void SRVoronoi::constructSphereSet(Array<MedialSphere> *medialSpheres, const Sur
     for (int i = 0; i < numPts; i++){
       if (!ptCovered.index(i)){
         int minJ = -1;
-        float minD = REAL_MAX;
+        REAL minD = REAL_MAX;
         Point3D p = surPts->index(i).p;
         for (int j = 0; j < numSph; j++){
-          float d = medialSpheres->index(j).s.c.distance(p) - medialSpheres->index(j).s.r;
+          REAL d = medialSpheres->index(j).s.c.distance(p) - medialSpheres->index(j).s.r;
           if (d < minD){
             minD = d;
             minJ = j;

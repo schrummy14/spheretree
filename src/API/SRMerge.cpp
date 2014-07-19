@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -56,7 +56,7 @@ SRMerge::SRMerge(){
 }
 
 //  reduce sphere set
-void SRMerge::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, float parSphereErr) const{
+void SRMerge::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &surRep, const Sphere *filterSphere, REAL parSphereErr) const{
   CHECK_DEBUG(sphereFitter != NULL, "need sphere fitter");
   CHECK_DEBUG(sphereEval != NULL, "need sphere evaluator");
 
@@ -65,7 +65,7 @@ void SRMerge::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &
 #else
   bool onlyOneSpherePerPoint = false;
 #endif
- 
+
   //  construct spheres from medial axis
   Array<MedialSphere> medialSpheres;
   constructSphereSet(&medialSpheres, surRep, filterSphere, parSphereErr, onlyOneSpherePerPoint);
@@ -118,19 +118,19 @@ void SRMerge::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &
   //  do reduction
   bool allDone = false;
   int initNumSpheres = numSpheres;
-  float firstError = 0, errFact = 0, errMult = 0;
+  REAL firstError = 0, errFact = 0, errMult = 0;
   while (numSpheres > numDest){
     int numMergers = mergers.getSize();
 
     //  when we get close to destination make all possible mergers
-    if (numMergers == 0 || (!allDone && numSpheres <= doAllBelow)){  
+    if (numMergers == 0 || (!allDone && numSpheres <= doAllBelow)){
       constructAllMergers(&mergers, medialSpheres, coverRep);
       numMergers = mergers.getSize();
       allDone = true;
       }
 
     int bestI = -1;
-    float minErr = -1;
+    REAL minErr = -1;
     if (useBeneficial){
       //  find the worst error
       double worstError = 0;
@@ -144,7 +144,7 @@ void SRMerge::getSpheres(Array<Sphere> *spheres, int numDest, const SurfaceRep &
         }
 
       //  try to find improvement to worst error
-      float minCost = 0;      
+      REAL minCost = 0;
       for (int i = 0; i < numMergers; i++){
         const Merger *m = &mergers.index(i);
         const MedialSphere *ms1 = &medialSpheres.index(m->i1);
@@ -362,7 +362,7 @@ void SRMerge::applyMerger(Array<Merger> *mergers, Array<MedialSphere> *medialSph
 
             numNew++;
             Merger *newMerge = &mergers->addItem();
-            constructMerger(newMerge, *medialSpheres, surPts, iA, iB);        
+            constructMerger(newMerge, *medialSpheres, surPts, iA, iB);
             }
           }
         }
@@ -380,7 +380,7 @@ void SRMerge::applyMerger(Array<Merger> *mergers, Array<MedialSphere> *medialSph
 
             numNew++;
             Merger *newMerge = &mergers->addItem();
-            constructMerger(newMerge, *medialSpheres, surPts, iA, iB);        
+            constructMerger(newMerge, *medialSpheres, surPts, iA, iB);
             }
           }
         }
@@ -416,7 +416,7 @@ void SRMerge::combineLists(Array<int> *dest, const Array<int> &l1, const Array<i
 
 /*
 
-  Illustrate the mergers 
+  Illustrate the mergers
 
   NOTE 1.0f/1000.0f is the scale of the output as 1000 is the default size we load model
                     not very generic - but it is the day before my Viva
@@ -425,8 +425,8 @@ void SRMerge::saveImage(const Array<MedialSphere> &medialSpheres, const Merger &
   Array<int> sel;
   Array<Sphere> spheres;
 
-  float colorPre[] = {0, 0.75, 0};
-  float colorPost[] = {0.75, 0, 0};
+  REAL colorPre[] = {0, 0.75, 0};
+  REAL colorPost[] = {0.75, 0, 0};
 
   int numMed = medialSpheres.getSize();
   for (int i = 0; i < numMed; i++){
@@ -452,7 +452,7 @@ void SRMerge::saveImage(const Array<MedialSphere> &medialSpheres, const Merger &
     //  reset lists
     spheres.resize(numValid - 2);
     sel.resize(0);
-    
+
     //  do post merge
     newSph = spheres.addIndex();
     spheres.index(newSph) = merger.s;

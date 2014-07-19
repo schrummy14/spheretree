@@ -13,15 +13,15 @@
 
                              D I S C L A I M E R
 
-  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR 
+  IN NO EVENT SHALL TRININTY COLLEGE DUBLIN BE LIABLE TO ANY PARTY FOR
   DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING,
-  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE 
-  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF 
+  BUT NOT LIMITED TO, LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE
+  AND ITS DOCUMENTATION, EVEN IF TRINITY COLLEGE DUBLIN HAS BEEN ADVISED OF
   THE POSSIBILITY OF SUCH DAMAGES.
 
-  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED 
-  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY 
+  TRINITY COLLEGE DUBLIN DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED
+  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE.  THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND TRINITY
   COLLEGE DUBLIN HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
   ENHANCEMENTS, OR MODIFICATIONS.
 
@@ -193,9 +193,9 @@ bool Surface::loadRhinoSurface(const char *fileName, char **err, float boxSize){
 
 float Surface::fitIntoBox(float boxSize){
   //  calculate scale to fit into a 2*2*2 box
-  float sX = 	2.0/(pMax.x - pMin.x);
-  float sY = 	2.0/(pMax.y - pMin.y);
-  float sZ = 	2.0/(pMax.z - pMin.z);
+  float sX = 2.0/(pMax.x - pMin.x);
+  float sY = 2.0/(pMax.y - pMin.y);
+  float sZ = 2.0/(pMax.z - pMin.z);
   float scale = sX;
   if (sY < scale)
 	  scale = sY;
@@ -209,11 +209,11 @@ float Surface::fitIntoBox(float boxSize){
 
   int numVert = vertices.getSize();
   for (int i = 0; i < numVert; i++){
-    //  pointer to vertex information
-    Point*p = &vertices.index(i);
-    p->p.x = (p->p.x-cX)*scale;
-    p->p.y = (p->p.y-cY)*scale;
-    p->p.z = (p->p.z-cZ)*scale;
+    //  WARNING: this modifies vertex information
+    Point& point = vertices.index(i);
+    point.p.x = (point.p.x-cX)*scale;
+    point.p.y = (point.p.y-cY)*scale;
+    point.p.z = (point.p.z-cZ)*scale;
     }
 
   //  update bounds
@@ -642,7 +642,7 @@ void Surface::stitchTriangles(){
           }
 //      CHECK_DEBUG0(minT >= 0);
 
-        if (minT >= 0){        
+        if (minT >= 0){
           //OUTPUTINFO("minD = %f\n", minD);
 
           //  link triangles
@@ -712,6 +712,7 @@ void Surface::getBoundingSphere(Sphere *s) const{
   Point3D xMin, xMax, yMin, yMax, zMin, zMax;
   xMin.x = yMin.y = zMin.z = REAL_MAX;
   xMax.x = yMax.y = zMax.z = REAL_MIN;
+
   for (int i = 0; i < numPts; i++){
     const Point3D& p = vertices.index(i).p;
 
@@ -728,7 +729,7 @@ void Surface::getBoundingSphere(Sphere *s) const{
     if (p.z < zMin.z)
       zMin = p;
     if (p.z > zMax.z)
-      zMax = p; 
+      zMax = p;
     }
 
   //  {x,y,z}-span is the square distance between {x,y,z}min and {x,y,z}max
@@ -902,8 +903,8 @@ void Surface::setupBoundingBox(){
 
   int numVert = vertices.getSize();
   for (int i = 0; i < numVert; i++){
-    Point3D p = vertices.index(i).p;
+    const Point3D& p = vertices.index(i).p;
     pMin.storeMin(p);
     pMax.storeMax(p);
-    }  
+    }
 }
