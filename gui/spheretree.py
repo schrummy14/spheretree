@@ -69,7 +69,7 @@ def algo_list():
     """
     return {"grid", "hubbard", "medial", "octree", "spawn"}
 
-def create_sch(dae_file=None, obj_file=None, algo="grid"):
+def create_sch(dae_file=None, obj_file=None, algo="grid", depth=3, branch=8):
     """
     Create a SCH file from a DAE (Collada) or OBJ (Wavefront) file.
     Requires meshlab for DAE to OBJ conversion.
@@ -109,7 +109,8 @@ def create_sch(dae_file=None, obj_file=None, algo="grid"):
     result_file = "/tmp/%s-%s.sph" % (name, algo)
     exec_name = "makeTree%s" % algo.capitalize()
     if not os.path.exists(result_file):
-        command = exec_name + " -nopause " + tmp_file
+        command = "%s -nopause -branch %i -depth %i %s" \
+                  % (exec_name, branch, depth, tmp_file)
         p = Popen(command, shell = True, stdin = sys.stdin, stdout = PIPE, stderr = PIPE, bufsize = 1)
 
         while p.poll() is None:
@@ -189,13 +190,19 @@ algo_list = algo_list()
 
 parser = OptionParser(description='Load and process a SPH file')
 parser.add_option('-l', '--level', default=0, type=int, metavar='level',
-                  help='Tree level')
+                  help='Tree level that will be displayed.')
+parser.add_option('-d', '--depth', default=3, type=int, metavar='depth',
+                  help='Depth of the sphere-tree.')
+parser.add_option('-b', '--branch', default=8, type=int, metavar='branch',
+                  help='Branching factor of the sphere-tree.')
 parser.add_option('-a', '--algo', default=default_algo, type=str,
-                  metavar='algo', help='Construction algorithm')
+                  metavar='algo', help='Construction algorithm.')
 
 options, args = parser.parse_args()
 input_file = args[0]
-sph_level = options.level
+sph_depth = options.depth
+sph_branch = options.branch
+sph_level = min(options.level, sph_depth)
 algo = options.algo
 
 if not algo in algo_list:
@@ -215,10 +222,12 @@ sphere_opacity = 0.5
 
 if from_dae:
     # Compute SCH result from DAE file
-    sph_file = create_sch(dae_file=input_file, algo=algo)
+    sph_file = create_sch(dae_file=input_file, algo=algo,
+                          depth=sph_depth, branch=sph_branch)
 elif from_obj:
     # Compute SCH result from OBJ file
-    sph_file = create_sch(obj_file=input_file, algo=algo)
+    sph_file = create_sch(obj_file=input_file, algo=algo,
+                          depth=sph_depth, branch=sph_branch)
 else:
     sph_file = input_file
     sphere_opacity = 1.0
