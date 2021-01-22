@@ -58,6 +58,6 @@ def makeLIGGGHTS(newFile, spheres):
     return
 
 if __name__ == "__main__":
-    fileNames = glob.glob('../models/bunny-1500-*.yml')
+    fileNames = glob.glob('*.yml')
     for f in fileNames:
         convert2liggghts(f)

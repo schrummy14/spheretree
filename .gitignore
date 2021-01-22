@@ -1,0 +1,12 @@
+Makefile
+build/*
+yml2liggghts/*
+!yml2liggghts/*.py
+models/*.liggghts
+models/simple-rock_stl*
+models/CornKernel*
+models/Rock_Template*
+models/simple-rock*
+models/*.yml
+models/03-16-2016/*
+gui/.vscode/*
